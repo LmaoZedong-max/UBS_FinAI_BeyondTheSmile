@@ -10,7 +10,7 @@
 ![Python](https://img.shields.io/badge/python-3.9%2B-blue)
 ![React](https://img.shields.io/badge/react-19-61dafb)
 ![FastAPI](https://img.shields.io/badge/FastAPI-REST%20%2B%20SSE-009688)
-![Tests](https://img.shields.io/badge/tests-36%20backend%20%2B%2019%20frontend-success)
+![Tests](https://img.shields.io/badge/tests-42%20backend%20%2B%2019%20frontend-success)
 
 *Two decades of vol-surface data → leakage-safe factor models → explainable forecasts → an AI research terminal that shows its work.*
 
@@ -127,7 +127,7 @@ The instance is branded "Beyond the Smile - UBS Fin AI Bootcamp" and defaults to
 
 ## Engineering
 
-- **55 automated tests** - 36 backend (every endpoint, incl. SSE frames + streaming-generator unit tests) + 19 frontend (SSE chunk-boundary parsing, typed error contract) - all gated in **GitHub Actions CI** on every push, which rebuilds the model store from raw data first.
+- **61 automated tests** - 42 backend (every endpoint, incl. SSE frames + streaming-generator unit tests) + 19 frontend (SSE chunk-boundary parsing, typed error contract) - all gated in **GitHub Actions CI** on every push, which rebuilds the model store from raw data first.
 - **API contract** - [docs/API_CONTRACT.md](docs/API_CONTRACT.md) is the single source of truth both halves build against.
 - **Reproducible** - pinned CI deps ([requirements-ci.txt](requirements-ci.txt)), containerized runtime, deterministic pipeline (`python -m finai.pipeline.run_pipeline`).
 

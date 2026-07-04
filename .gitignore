@@ -3,7 +3,10 @@
 venv/
 __pycache__/
 *.pyc
+.pytest_cache/
 .DS_Store
+*.log
+~$*
 .ipynb_checkpoints/
 node_modules/
 frontend/dist/
