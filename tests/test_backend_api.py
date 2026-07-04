@@ -573,7 +573,10 @@ class TestOpenAICompat:
         stub.chat.completions.create.side_effect = [first_resp, second_resp]
         return stub
 
-    def test_nonstream_200_with_stub(self, client: TestClient) -> None:
+    def test_nonstream_200_with_stub(self, client: TestClient, monkeypatch) -> None:
+        # The endpoint gates on os.environ before reaching the (stubbed) client,
+        # so CI (no .env) needs a dummy key for this test to exercise the stub.
+        monkeypatch.setenv("DEEPSEEK_API_KEY", "test-key")
         stub = self._make_stub_client()
         with patch("finai.app.chat.get_client", return_value=stub):
             r = client.post(
@@ -594,7 +597,8 @@ class TestOpenAICompat:
     # POST /v1/chat/completions - stub client, streaming
     # -----------------------------------------------------------------------
 
-    def test_stream_200_with_stub(self, client: TestClient) -> None:
+    def test_stream_200_with_stub(self, client: TestClient, monkeypatch) -> None:
+        monkeypatch.setenv("DEEPSEEK_API_KEY", "test-key")
         stub = self._make_stub_client()
         with patch("finai.app.chat.get_client", return_value=stub):
             r = client.post(
