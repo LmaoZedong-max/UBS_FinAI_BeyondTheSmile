@@ -36,6 +36,43 @@ cp .env.example .env   # then fill in DEEPSEEK_API_KEY
 
 Open http://localhost:5173.
 
+## Docker
+
+Run the full stack (FastAPI backend + React frontend) in two containers with a single command.
+
+### Prerequisites
+
+- Docker Desktop (or Docker Engine + Compose v2) installed and running.
+- A DeepSeek API key — only needed for the `/api/chat` and `/api/chat/stream` endpoints; every other endpoint works without it.
+
+### Setup
+
+```bash
+# 1. Create a .env file at the repo root (never commit this file)
+echo "DEEPSEEK_API_KEY=sk-..." > .env
+
+# 2. Build images and start containers
+docker compose up --build
+```
+
+The first build takes a few minutes — it installs Python dependencies and runs the vol-pipeline (HAR-X + GBM + SHAP) to pre-populate `finai/store/` inside the image.
+Subsequent starts are instant (store already baked in).
+
+### Endpoints
+
+| Service | URL |
+|---|---|
+| Web terminal | http://localhost:8080 |
+| API (via nginx proxy) | http://localhost:8080/api/health |
+| API (direct, for debugging) | http://localhost:8000/api/health |
+| Interactive API docs | http://localhost:8000/docs |
+
+### Stop
+
+```bash
+docker compose down
+```
+
 ## Modeling notes
 
 - In-sample/out-of-sample split at 2019-12-31/2020-01-01; PCA, AR(1) de-meaning,

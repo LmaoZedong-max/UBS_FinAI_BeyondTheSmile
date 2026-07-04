@@ -1,0 +1,46 @@
+# Beyond the Smile — backend image
+# python:3.11-slim keeps the image small; libgomp1 is required by LightGBM.
+FROM python:3.11-slim
+
+# System dependencies
+RUN apt-get update && apt-get install -y --no-install-recommends \
+        libgomp1 \
+    && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /app
+
+# Install the runtime-only Python dependencies.
+# torch, transformers, streamlit, matplotlib, plotly are excluded:
+#   - sentiment (FinBERT/torch) is lazy-imported and not needed to serve the API.
+#   - streamlit/matplotlib/plotly are research/UI tools not used by the backend.
+RUN pip install --no-cache-dir \
+    pandas \
+    numpy \
+    scikit-learn \
+    statsmodels \
+    scipy \
+    lightgbm \
+    shap \
+    pyarrow \
+    python-dotenv \
+    openai \
+    fastapi \
+    "uvicorn[standard]" \
+    eval_type_backport \
+    requests \
+    httpx
+
+# Copy application source
+COPY finai/ finai/
+COPY backend/ backend/
+COPY FINAL_Data.csv .
+COPY "NLP Outputs/" "NLP Outputs/"
+
+# Build the store at image-build time so containers start instantly.
+# --skip-sentiment avoids pulling torch/transformers at runtime.
+RUN python -m finai.pipeline.run_pipeline --skip-sentiment
+
+# DEEPSEEK_API_KEY must be passed at runtime (docker run -e or docker-compose env).
+# It is NOT baked into the image.
+EXPOSE 8000
+CMD ["uvicorn", "backend.main:app", "--host", "0.0.0.0", "--port", "8000"]

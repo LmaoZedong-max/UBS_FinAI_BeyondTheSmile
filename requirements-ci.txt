@@ -1,0 +1,15 @@
+pandas
+numpy
+scikit-learn
+statsmodels
+scipy
+lightgbm
+shap
+pyarrow
+python-dotenv
+openai
+fastapi
+uvicorn
+eval_type_backport
+pytest
+httpx

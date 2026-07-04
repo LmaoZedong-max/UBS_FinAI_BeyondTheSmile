@@ -1,0 +1,49 @@
+# Python / build artefacts
+__pycache__/
+*.py[cod]
+*.pyo
+.pytest_cache/
+
+# Virtual environments
+.venv/
+venv/
+env/
+
+# Node (only relevant if Docker context is ever set to repo root)
+node_modules/
+frontend/node_modules/
+frontend/dist/
+
+# Version control
+.git/
+.gitignore
+
+# Editor / tooling
+.claude/
+.vscode/
+.idea/
+*.DS_Store
+
+# Secrets — never in the image
+.env
+.env.*
+!.env.example
+
+# Pre-built store (rebuilt at image-build time by run_pipeline)
+finai/store/
+
+# Jupyter notebooks (not needed at runtime)
+*.ipynb
+
+# Research/raw data directories not needed at runtime
+NLP Data/
+NLP Data Cleaned/
+Other Data/
+
+# Large raw data files not needed at runtime
+# (FINAL_Data.csv IS needed — keep it)
+CFETS_FXIV_ALLVOLS_3XDAILY.csv
+FinAI_Macro_BBG_Data.xlsx
+
+# Misc
+windpy.yml

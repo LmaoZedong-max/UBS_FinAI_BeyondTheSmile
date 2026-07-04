@@ -17,9 +17,21 @@ if str(PROJECT_ROOT) not in sys.path:
 import pytest
 from fastapi.testclient import TestClient
 
+STORE_DIR = PROJECT_ROOT / "finai" / "store"
+
 
 @pytest.fixture(scope="session")
 def client() -> TestClient:
     """Session-scoped TestClient — imports app once, reuses data_access lru_cache."""
     from backend.main import app
     return TestClient(app)
+
+
+def pytest_collection_modifyitems(items: list) -> None:
+    """Skip sentiment tests when sentiment_daily.parquet is absent (e.g. --skip-sentiment CI run)."""
+    if (STORE_DIR / "sentiment_daily.parquet").exists():
+        return
+    skip_mark = pytest.mark.skip(reason="sentiment_daily.parquet not in store (pipeline run with --skip-sentiment)")
+    for item in items:
+        if "TestSentiment" in item.nodeid:
+            item.add_marker(skip_mark)
