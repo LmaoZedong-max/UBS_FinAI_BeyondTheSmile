@@ -18,6 +18,32 @@
 
 ---
 
+## Live demo (GitHub Codespaces)
+
+[![Open in GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/nl2992/UBS_FinAI_BeyondTheSmile)
+
+No local install needed - the full stack (FastAPI + React + model store) runs inside a Codespace in about 3 minutes.
+
+**Steps:**
+
+1. Fork (or use) the repo, then click **Code -> Codespaces -> Create codespace on main** (or the badge above).
+2. **Add your `DEEPSEEK_API_KEY` as a Codespaces secret** before creating the Codespace (or rebuild after adding it):
+   - GitHub -> Settings -> Secrets and variables -> Codespaces -> New repository secret
+   - Name: `DEEPSEEK_API_KEY` | Value: your DeepSeek API key
+   - Without the secret, every feature works except the streaming chat.
+3. Wait for `postCreate` to finish (~3 min - it builds the vol model store for three CNH factors).
+4. In the integrated terminal, run:
+   ```bash
+   bash scripts/codespace_start.sh
+   ```
+5. Codespaces will auto-forward port **5173**. Click **Open in Browser** (or the PORTS panel) and try the chat:
+
+   > **"What drove CNH ATM vol on 2025-12-16?"**
+
+The backend API is also reachable at the forwarded **:8000** port (`/docs` for the Swagger UI).
+
+---
+
 ## What it does
 
 Ask it a question like:
