@@ -187,3 +187,87 @@ export async function postChat(messages: ChatMessage[]): Promise<string> {
   })
   return data.reply
 }
+
+// --- Streaming chat (v3) ---
+
+export interface StreamChatCallbacks {
+  /** Called for each tool invocation event before the final answer. */
+  onTool: (name: string) => void
+  /** Called with each incremental text chunk from the assistant. */
+  onDelta: (text: string) => void
+  /** Called when the stream finishes cleanly. */
+  onDone: () => void
+  /** Called when an error event is received from the server. */
+  onError: (detail: string) => void
+}
+
+/**
+ * Stream a chat turn via POST /api/chat/stream.
+ * Parses SSE frames from the ReadableStream manually.
+ * Throws (rejects) only if the fetch itself fails or the response is not an
+ * event-stream — callers should fall back to postChat in that case.
+ */
+export async function streamChat(
+  messages: ChatMessage[],
+  callbacks: StreamChatCallbacks,
+): Promise<void> {
+  const res = await fetch('/api/chat/stream', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ messages }),
+  })
+
+  if (!res.ok || !res.body || !res.headers.get('content-type')?.includes('text/event-stream')) {
+    // Signal to caller that streaming is unavailable
+    throw new Error(`stream unavailable: ${res.status} ${res.statusText}`)
+  }
+
+  const reader = res.body.getReader()
+  const decoder = new TextDecoder()
+  let buffer = ''
+
+  while (true) {
+    const { value, done } = await reader.read()
+    if (done) break
+    buffer += decoder.decode(value, { stream: true })
+
+    // SSE frames are separated by double newline
+    const frames = buffer.split('\n\n')
+    // Last element may be an incomplete frame — keep it in the buffer
+    buffer = frames.pop() ?? ''
+
+    for (const frame of frames) {
+      if (!frame.trim()) continue
+
+      let eventName = 'message'
+      let dataLine = ''
+
+      for (const line of frame.split('\n')) {
+        if (line.startsWith('event:')) {
+          eventName = line.slice('event:'.length).trim()
+        } else if (line.startsWith('data:')) {
+          dataLine = line.slice('data:'.length).trim()
+        }
+      }
+
+      if (!dataLine) continue
+
+      let payload: Record<string, unknown>
+      try {
+        payload = JSON.parse(dataLine) as Record<string, unknown>
+      } catch {
+        continue
+      }
+
+      if (eventName === 'tool') {
+        callbacks.onTool(typeof payload.name === 'string' ? payload.name : '')
+      } else if (eventName === 'delta') {
+        callbacks.onDelta(typeof payload.text === 'string' ? payload.text : '')
+      } else if (eventName === 'done') {
+        callbacks.onDone()
+      } else if (eventName === 'error') {
+        callbacks.onError(typeof payload.detail === 'string' ? payload.detail : 'Unknown error')
+      }
+    }
+  }
+}

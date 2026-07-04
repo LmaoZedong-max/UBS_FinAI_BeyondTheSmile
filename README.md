@@ -30,9 +30,8 @@ cp .env.example .env   # then fill in DEEPSEEK_API_KEY
 # 3. build the store (vol models + SHAP; add news/alerts with no flags)
 ~/.venvs/beyond-the-smile/bin/python3 -m finai.pipeline.run_pipeline --skip-sentiment
 
-# 4. backend + frontend
-~/.venvs/beyond-the-smile/bin/python3 -m uvicorn backend.main:app --port 8000
-cd frontend && npm install && npm run dev
+# 4. backend + frontend (or run them individually — see backend/README.md)
+./scripts/dev.sh            # add --with-streamlit for the research UI too
 ```
 
 Open http://localhost:5173.

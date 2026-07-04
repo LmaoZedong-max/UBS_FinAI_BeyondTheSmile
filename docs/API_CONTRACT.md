@@ -69,3 +69,19 @@ across the window; sum the remainder into "Other".
 - Alerts page gains a "News Sentiment" strip above the alert list: one card per
   /api/sentiment row (date, doc_id, label badge — red negative / grey neutral /
   green positive — score to 2dp, confidence to 2dp).
+
+## v3 additions
+
+### POST /api/chat/stream
+Same request body as /api/chat. Response: Server-Sent Events (`text/event-stream`).
+Events, in order:
+- zero or more `event: tool` — `data: {"name": "get_shap_drivers", "status": "called"}` (one per tool invocation, lets the UI show "consulting store…")
+- one or more `event: delta` — `data: {"text": "..."}` incremental assistant text
+- terminal `event: done` — `data: {}`
+- on error: `event: error` — `data: {"detail": "..."}` then close. Missing key → single error event with detail "DEEPSEEK_API_KEY not configured".
+Implementation: run the existing tool-hop loop non-streamed; stream only the final completion (stream=True on the last DeepSeek call, forwarding content deltas).
+
+### Frontend v3
+- Chat page uses /api/chat/stream via fetch + ReadableStream (POST body, parse SSE frames manually).
+- Assistant bubble renders deltas incrementally; while tool events arrive show a muted "consulting data store…" status line above the bubble.
+- On error event render the detail in the existing error style. Keep POST /api/chat code as fallback if stream fails to open.

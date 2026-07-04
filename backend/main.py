@@ -13,8 +13,11 @@ import re
 from pathlib import Path
 from typing import Any
 
+import json as _json
+
 from fastapi import FastAPI, HTTPException, Query
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import StreamingResponse
 from pydantic import BaseModel
 
 # ---------------------------------------------------------------------------
@@ -414,3 +417,39 @@ def chat(body: ChatRequest) -> ChatResponse:
         raise HTTPException(status_code=500, detail=str(exc)) from exc
 
     return ChatResponse(reply=reply)
+
+
+def _sse_frame(event: str, data: dict) -> str:
+    """Format a single SSE frame per the contract."""
+    return f"event: {event}\ndata: {_json.dumps(data)}\n\n"
+
+
+@app.post("/api/chat/stream")
+def chat_stream(body: ChatRequest) -> StreamingResponse:
+    """Stream assistant replies as Server-Sent Events (text/event-stream)."""
+
+    def generate():
+        # Missing API key → single error event, no raise before streaming starts
+        if not os.environ.get("DEEPSEEK_API_KEY"):
+            yield _sse_frame("error", {"detail": "DEEPSEEK_API_KEY not configured"})
+            return
+
+        from finai.app.chat import run_chat_turn_stream  # noqa: PLC0415
+
+        history = [{"role": m.role, "content": m.content} for m in body.messages[:-1]]
+        user_message = body.messages[-1].content if body.messages else ""
+
+        try:
+            for kind, payload in run_chat_turn_stream(history=history, user_message=user_message):
+                if kind == "tool":
+                    yield _sse_frame("tool", {"name": payload, "status": "called"})
+                elif kind == "delta":
+                    yield _sse_frame("delta", {"text": payload})
+                elif kind == "done":
+                    yield _sse_frame("done", {})
+        except RuntimeError as exc:
+            yield _sse_frame("error", {"detail": "DEEPSEEK_API_KEY not configured"})
+        except Exception as exc:
+            yield _sse_frame("error", {"detail": str(exc)})
+
+    return StreamingResponse(generate(), media_type="text/event-stream")
