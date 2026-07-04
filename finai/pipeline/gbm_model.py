@@ -52,7 +52,7 @@ def rolling_gbm_forecast(
     lgb_params: dict | None = None,
 ) -> GBMForecastResult:
     """Predict log(RV_{t+1}) with a LightGBM regressor, refit every `refit_every`
-    trading days on a trailing `lookback` window using only data up to t-1 —
+    trading days on a trailing `lookback` window using only data up to t-1 -
     same no-lookahead discipline and same feature set (harx_design) as HAR-X,
     so the two models are directly comparable in eval_all_models_for_factor."""
     params = {**DEFAULT_LGB_PARAMS, **(lgb_params or {})}

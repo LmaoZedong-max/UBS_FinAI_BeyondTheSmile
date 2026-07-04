@@ -1,4 +1,4 @@
-"""Tear-sheet PDF generation for Beyond the Smile — UBS Fin AI Bootcamp.
+"""Tear-sheet PDF generation for Beyond the Smile - UBS Fin AI Bootcamp.
 
 build_tearsheet_pdf(factor, model) -> bytes
   Renders a one-page A4-landscape PDF using matplotlib (Agg backend).
@@ -56,7 +56,7 @@ def build_tearsheet_pdf(factor: str, model: str) -> bytes:
     ].copy() if not shap_df.empty else pd.DataFrame()
 
     # ------------------------------------------------------------------ #
-    # Figure layout — A4 landscape 297×210 mm = 11.69×8.27 in
+    # Figure layout - A4 landscape 297×210 mm = 11.69×8.27 in
     # ------------------------------------------------------------------ #
     fig = plt.figure(figsize=(11.69, 8.27), facecolor=_WHITE)
     fig.patch.set_facecolor(_WHITE)
@@ -71,7 +71,7 @@ def build_tearsheet_pdf(factor: str, model: str) -> bytes:
     )
 
     # ------------------------------------------------------------------ #
-    # Row 0 — Title block (spans full width)
+    # Row 0 - Title block (spans full width)
     # ------------------------------------------------------------------ #
     ax_title = fig.add_subplot(gs[0, :])
     ax_title.axis("off")
@@ -79,7 +79,7 @@ def build_tearsheet_pdf(factor: str, model: str) -> bytes:
     gen_date = date.today().strftime("%Y-%m-%d")
     ax_title.text(
         0.0, 1.0,
-        "Beyond the Smile — UBS Fin AI Bootcamp",
+        "Beyond the Smile - UBS Fin AI Bootcamp",
         transform=ax_title.transAxes,
         fontsize=14, fontweight="bold", color=_RED, va="top",
     )
@@ -94,7 +94,7 @@ def build_tearsheet_pdf(factor: str, model: str) -> bytes:
     ax_title.axhline(y=0.0, color=_RED, linewidth=1.5, xmin=0, xmax=1)
 
     # ------------------------------------------------------------------ #
-    # Row 1, Col 0 — OOS Forecast Line Chart
+    # Row 1, Col 0 - OOS Forecast Line Chart
     # ------------------------------------------------------------------ #
     ax_fc = fig.add_subplot(gs[1, 0])
     ax_fc.set_facecolor(_WHITE)
@@ -128,7 +128,7 @@ def build_tearsheet_pdf(factor: str, model: str) -> bytes:
     ax_fc.grid(color=_GRID, linestyle="--", linewidth=0.5, alpha=0.7)
 
     # ------------------------------------------------------------------ #
-    # Row 1, Col 1 — Top-8 SHAP horizontal bar chart
+    # Row 1, Col 1 - Top-8 SHAP horizontal bar chart
     # ------------------------------------------------------------------ #
     ax_shap = fig.add_subplot(gs[1, 1])
     ax_shap.set_facecolor(_WHITE)
@@ -165,7 +165,7 @@ def build_tearsheet_pdf(factor: str, model: str) -> bytes:
         spine.set_edgecolor(_GRID)
 
     # ------------------------------------------------------------------ #
-    # Row 2, Col 0-1 — Metrics table (spans full width)
+    # Row 2, Col 0-1 - Metrics table (spans full width)
     # ------------------------------------------------------------------ #
     ax_tbl = fig.add_subplot(gs[2, :])
     ax_tbl.axis("off")
@@ -176,19 +176,19 @@ def build_tearsheet_pdf(factor: str, model: str) -> bytes:
 
         def _fmt(v):
             if v is None:
-                return "—"
+                return "-"
             try:
                 import math
                 f = float(v)
-                return "—" if math.isnan(f) else f"{f:.3f}"
+                return "-" if math.isnan(f) else f"{f:.3f}"
             except (TypeError, ValueError):
-                return "—"
+                return "-"
 
         table_data = []
         for _, row in eval_sub.iterrows():
             table_data.append([
                 str(row.get("model", "")),
-                str(int(row.get("n_oos", 0))) if row.get("n_oos") is not None else "—",
+                str(int(row.get("n_oos", 0))) if row.get("n_oos") is not None else "-",
                 _fmt(row.get("QLIKE_daily")),
                 _fmt(row.get("Corr_daily")),
                 _fmt(row.get("QLIKE_week")),
@@ -222,7 +222,7 @@ def build_tearsheet_pdf(factor: str, model: str) -> bytes:
                     transform=ax_tbl.transAxes, color=_MID_GREY, fontsize=8)
 
     # ------------------------------------------------------------------ #
-    # Row 3 — Footer (sentiment + source)
+    # Row 3 - Footer (sentiment + source)
     # ------------------------------------------------------------------ #
     ax_foot = fig.add_subplot(gs[3, :])
     ax_foot.axis("off")
@@ -231,7 +231,7 @@ def build_tearsheet_pdf(factor: str, model: str) -> bytes:
     if not sent_df.empty:
         try:
             # sentiment_daily is date-indexed and a date can carry several news
-            # docs — summarise each one on the latest date as "label score".
+            # docs - summarise each one on the latest date as "label score".
             latest_sent_idx = sent_df.index.max()
             latest = sent_df.loc[[latest_sent_idx]]
             sent_date = str(latest_sent_idx)[:10]

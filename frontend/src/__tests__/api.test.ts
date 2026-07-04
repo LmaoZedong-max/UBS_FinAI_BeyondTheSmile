@@ -2,15 +2,15 @@
  * Unit tests for frontend/src/api.ts
  *
  * Covers:
- *   1. parseSSEChunks — the pure SSE frame parser extracted from streamChat.
+ *   1. parseSSEChunks - the pure SSE frame parser extracted from streamChat.
  *      Tests the split-chunk reassembly, multiple-frames-per-chunk ordering,
  *      the full tool→delta→done sequence, error events, and JSON parse errors.
  *
- *   2. streamChat — integration tests via a mocked global fetch returning a
+ *   2. streamChat - integration tests via a mocked global fetch returning a
  *      ReadableStream. Verifies the non-event-stream / fetch-rejection paths
  *      that the public API must reject on.
  *
- *   3. request() — mocked fetch for 404 / 422 / 503 → ApiError, plus happy
+ *   3. request() - mocked fetch for 404 / 422 / 503 → ApiError, plus happy
  *      path returning typed JSON (tested through exported wrappers).
  */
 
@@ -53,7 +53,7 @@ function e(s: string): Uint8Array {
 }
 
 // ---------------------------------------------------------------------------
-// 1. parseSSEChunks — pure parser
+// 1. parseSSEChunks - pure parser
 // ---------------------------------------------------------------------------
 
 describe('parseSSEChunks', () => {
@@ -159,7 +159,7 @@ describe('parseSSEChunks', () => {
 })
 
 // ---------------------------------------------------------------------------
-// 2. streamChat — fetch-level integration (mocked fetch)
+// 2. streamChat - fetch-level integration (mocked fetch)
 // ---------------------------------------------------------------------------
 
 describe('streamChat', () => {
@@ -250,7 +250,7 @@ describe('streamChat', () => {
 })
 
 // ---------------------------------------------------------------------------
-// 3. request() — via exported convenience wrappers (mocked fetch)
+// 3. request() - via exported convenience wrappers (mocked fetch)
 // ---------------------------------------------------------------------------
 
 describe('request() error handling', () => {
@@ -308,7 +308,7 @@ describe('request() error handling', () => {
     expect((err as ApiError).status).toBe(503)
   })
 
-  it('returns typed JSON on 200 — getHealth happy path', async () => {
+  it('returns typed JSON on 200 - getHealth happy path', async () => {
     vi.stubGlobal(
       'fetch',
       vi.fn().mockResolvedValue(
@@ -322,7 +322,7 @@ describe('request() error handling', () => {
     expect(result).toEqual({ status: 'ok' })
   })
 
-  it('returns typed JSON on 200 — getFactors unwraps .factors array', async () => {
+  it('returns typed JSON on 200 - getFactors unwraps .factors array', async () => {
     vi.stubGlobal(
       'fetch',
       vi.fn().mockResolvedValue(

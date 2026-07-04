@@ -37,16 +37,16 @@ const COLORS = {
   muted: '#6A6A6A',
 }
 
-// Attribution panel — stable color palette per feature slot.
+// Attribution panel - stable color palette per feature slot.
 // Slot 0 = UBS red (first driver), then muted grey tones, "Other" darkest.
 const ATTRIB_PALETTE = [
-  '#E60000', // UBS red — most impactful driver
+  '#E60000', // UBS red - most impactful driver
   '#8A8D90',
   '#6A6A6A',
   '#AEAEAE',
   '#4A4A4A',
   '#C8C8C8',
-  '#3A3A3A', // "Other" — darkest grey
+  '#3A3A3A', // "Other" - darkest grey
 ]
 
 function attribColor(index: number, total: number): string {
@@ -56,7 +56,7 @@ function attribColor(index: number, total: number): string {
 }
 
 function fmt(v: number | null | undefined): string {
-  return v === null || v === undefined || Number.isNaN(v) ? '—' : v.toFixed(3)
+  return v === null || v === undefined || Number.isNaN(v) ? '-' : v.toFixed(3)
 }
 
 const tooltipStyle = {
@@ -208,7 +208,7 @@ export default function Terminal() {
           onChange={(e) => setFactor(e.target.value)}
           disabled={factors.length === 0}
         >
-          {factors.length === 0 && <option value="">— no factors —</option>}
+          {factors.length === 0 && <option value="">- no factors -</option>}
           {factors.map((f) => (
             <option key={f} value={f}>
               {f}
@@ -217,7 +217,7 @@ export default function Terminal() {
         </select>
         {factorsError && (
           <span className="font-mono text-xs text-muted">
-            backend unreachable — {factorsError}
+            backend unreachable - {factorsError}
           </span>
         )}
         {factor && (
@@ -260,7 +260,7 @@ export default function Terminal() {
                   contentStyle={tooltipStyle}
                   labelStyle={{ color: '#ECECEC' }}
                   formatter={(value) =>
-                    typeof value === 'number' ? value.toFixed(4) : '—'
+                    typeof value === 'number' ? value.toFixed(4) : '-'
                   }
                 />
                 <Legend wrapperStyle={{ fontSize: 12, fontFamily: 'monospace' }} />
@@ -360,7 +360,7 @@ export default function Terminal() {
                 onChange={(e) => setShapDate(e.target.value)}
                 disabled={shapDates.length === 0}
               >
-                {shapDates.length === 0 && <option value="">— no dates —</option>}
+                {shapDates.length === 0 && <option value="">- no dates -</option>}
                 {shapDates.map((d) => (
                   <option key={d} value={d}>
                     {d}
@@ -403,7 +403,7 @@ export default function Terminal() {
                     contentStyle={tooltipStyle}
                     labelStyle={{ color: '#ECECEC' }}
                     formatter={(value) =>
-                      typeof value === 'number' ? value.toFixed(4) : '—'
+                      typeof value === 'number' ? value.toFixed(4) : '-'
                     }
                   />
                   <ReferenceLine x={0} stroke={COLORS.muted} />
@@ -422,8 +422,8 @@ export default function Terminal() {
         </Panel>
       </div>
 
-      {/* Attribution panel — monthly mean SHAP (macro drivers) */}
-      <Panel title="Attribution — monthly mean SHAP (macro drivers)">
+      {/* Attribution panel - monthly mean SHAP (macro drivers) */}
+      <Panel title="Attribution - monthly mean SHAP (macro drivers)">
         {attribLoading ? (
           <Spinner label="Loading attribution…" />
         ) : attribError ? (
@@ -456,7 +456,7 @@ export default function Terminal() {
                   contentStyle={tooltipStyle}
                   labelStyle={{ color: '#ECECEC' }}
                   formatter={(value) =>
-                    typeof value === 'number' ? value.toFixed(4) : '—'
+                    typeof value === 'number' ? value.toFixed(4) : '-'
                   }
                 />
                 <Legend wrapperStyle={{ fontSize: 11, fontFamily: 'monospace' }} />

@@ -1,4 +1,4 @@
-"""Beyond the Smile — UBS Fin AI Bootcamp API
+"""Beyond the Smile - UBS Fin AI Bootcamp API
 
 FastAPI backend implementing the API contract at docs/API_CONTRACT.md.
 Run from the project root so that `finai` imports resolve:
@@ -21,7 +21,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import Response, StreamingResponse
 from pydantic import BaseModel
 
-# Load .env (DEEPSEEK_API_KEY) before any endpoint checks os.environ —
+# Load .env (DEEPSEEK_API_KEY) before any endpoint checks os.environ -
 # the lazy llm_client import would otherwise load it too late.
 load_dotenv()
 
@@ -29,7 +29,7 @@ load_dotenv()
 # App setup
 # ---------------------------------------------------------------------------
 
-app = FastAPI(title="Beyond the Smile — UBS Fin AI Bootcamp API")
+app = FastAPI(title="Beyond the Smile - UBS Fin AI Bootcamp API")
 
 app.add_middleware(
     CORSMiddleware,

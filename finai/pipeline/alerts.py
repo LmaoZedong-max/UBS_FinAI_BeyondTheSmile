@@ -117,7 +117,7 @@ def generate_alerts_for_days(news_top5: pd.DataFrame, clean_dir: Path, outputs_d
             )
             reports.append(header + txt)
 
-        out_text = f"UBS Professional Risk Alerts — Panel Date: {day.date()}\n" + "\n".join(reports)
+        out_text = f"UBS Professional Risk Alerts - Panel Date: {day.date()}\n" + "\n".join(reports)
         out_file = outputs_dir / f"risk_alert_{safe_filename(str(day.date()))}.txt"
         out_file.write_text(out_text, encoding="utf-8")
         written.append(out_file)

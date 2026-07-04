@@ -306,7 +306,7 @@ class TestAlerts:
 
 
 # ===========================================================================
-# POST /api/chat  — no DEEPSEEK_API_KEY → 503
+# POST /api/chat  - no DEEPSEEK_API_KEY → 503
 # ===========================================================================
 
 class TestChat:
@@ -321,7 +321,7 @@ class TestChat:
 
 
 # ===========================================================================
-# POST /api/chat/stream — no DEEPSEEK_API_KEY → SSE error event
+# POST /api/chat/stream - no DEEPSEEK_API_KEY → SSE error event
 # ===========================================================================
 
 class TestChatStream:
@@ -359,7 +359,7 @@ class TestChatStream:
 
 
 # ===========================================================================
-# Chat generator unit test — stub get_client with two completions:
+# Chat generator unit test - stub get_client with two completions:
 #   1st → tool_call(get_forecast)   2nd → plain message
 # ===========================================================================
 

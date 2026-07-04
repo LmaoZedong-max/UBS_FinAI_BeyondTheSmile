@@ -1,1 +1,1 @@
-# Beyond the Smile — UBS Fin AI Bootcamp backend package
+# Beyond the Smile - UBS Fin AI Bootcamp backend package

@@ -5,9 +5,9 @@ import streamlit as st
 from finai.app import data_access as da
 from finai.app import theme
 
-st.set_page_config(page_title="FinAI — Dashboard", layout="wide")
+st.set_page_config(page_title="FinAI - Dashboard", layout="wide")
 theme.inject(st)
-theme.topbar(st, "Dashboard — forecasts & SHAP driver attribution")
+theme.topbar(st, "Dashboard - forecasts & SHAP driver attribution")
 
 daily = da.daily_outputs()
 if daily.empty:

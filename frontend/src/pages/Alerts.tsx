@@ -127,7 +127,7 @@ export default function Alerts() {
 
       {/* Reader pane */}
       <Panel
-        title={selected ? `Alert — ${selected}` : 'Alert Reader'}
+        title={selected ? `Alert - ${selected}` : 'Alert Reader'}
         className="min-h-[400px]"
       >
         {textLoading ? (

@@ -22,7 +22,7 @@ STORE_DIR = PROJECT_ROOT / "finai" / "store"
 
 @pytest.fixture(scope="session")
 def client() -> TestClient:
-    """Session-scoped TestClient — imports app once, reuses data_access lru_cache."""
+    """Session-scoped TestClient - imports app once, reuses data_access lru_cache."""
     from backend.main import app
     return TestClient(app)
 

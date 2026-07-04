@@ -6,7 +6,7 @@ import streamlit as st
 
 from finai.app import theme
 
-st.set_page_config(page_title="FinAI — USD/CNY-CNH Vol Terminal", layout="wide", initial_sidebar_state="expanded")
+st.set_page_config(page_title="FinAI - USD/CNY-CNH Vol Terminal", layout="wide", initial_sidebar_state="expanded")
 theme.inject(st)
 theme.topbar(st, "USD/CNY & USD/CNH volatility research terminal")
 

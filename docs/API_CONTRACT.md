@@ -1,6 +1,6 @@
-# Beyond the Smile — API Contract (backend :8000 ⇄ frontend :5173)
+# Beyond the Smile - API Contract (backend :8000 ⇄ frontend :5173)
 
-Brand: **Beyond the Smile — UBS Fin AI Bootcamp**. All endpoints prefixed `/api`. JSON everywhere. CORS must allow http://localhost:5173.
+Brand: **Beyond the Smile - UBS Fin AI Bootcamp**. All endpoints prefixed `/api`. JSON everywhere. CORS must allow http://localhost:5173.
 
 Data source: `finai/store/*.parquet` (already produced by `python -m finai.pipeline.run_pipeline`), read via `finai/app/data_access.py` helpers where possible. Alert text files live in `NLP Outputs/risk_alert_YYYY-MM-DD.txt`.
 
@@ -10,7 +10,7 @@ Data source: `finai/store/*.parquet` (already produced by `python -m finai.pipel
 `{"status": "ok"}`
 
 ### GET /api/factors
-`{"factors": ["CNH_ATM_PC1", ...]}` — from `data_access.available_factors()`.
+`{"factors": ["CNH_ATM_PC1", ...]}` - from `data_access.available_factors()`.
 
 ### GET /api/forecasts?factor=CNH_ATM_PC1&start=2020-01-01&end=2025-12-31
 ```json
@@ -28,7 +28,7 @@ Nulls allowed for missing values. Dates ISO `YYYY-MM-DD`. start/end optional.
 `model` ∈ {"HAR-X", "GBM"}; returns `{"date", "factor", "model", "drivers": [{"feature", "shap_value"}]}` sorted by |shap| desc. 404 with `{"detail": ...}` if not found.
 
 ### GET /api/shap/dates?factor=CNH_ATM_PC1
-`{"dates": ["2020-01-01", ...]}` — dates with SHAP rows for that factor (for the date picker).
+`{"dates": ["2020-01-01", ...]}` - dates with SHAP rows for that factor (for the date picker).
 
 ### GET /api/sentiment
 All rows of sentiment_daily: `{"rows": [{"date", "doc_id", "label", "sent_score", "confidence"}]}` (may be empty).
@@ -42,7 +42,7 @@ All rows of sentiment_daily: `{"rows": [{"date", "doc_id", "label", "sent_score"
 ### POST /api/chat
 Request: `{"messages": [{"role": "user"|"assistant", "content": "..."}]}` (full history, last item is the new user message).
 Response: `{"reply": "assistant text"}`.
-Implementation: reuse the tool-calling loop from `finai/app/chat.py` (`run_chat_turn`) — DeepSeek via `finai/pipeline/llm_client.py`, key from env `DEEPSEEK_API_KEY`. If key missing, return 503 with `{"detail": "DEEPSEEK_API_KEY not configured"}`.
+Implementation: reuse the tool-calling loop from `finai/app/chat.py` (`run_chat_turn`) - DeepSeek via `finai/pipeline/llm_client.py`, key from env `DEEPSEEK_API_KEY`. If key missing, return 503 with `{"detail": "DEEPSEEK_API_KEY not configured"}`.
 
 ## Frontend expectations
 - Dev server: Vite on :5173, proxy `/api` → `http://localhost:8000`.
@@ -67,18 +67,18 @@ across the window; sum the remainder into "Other".
   /api/shap/timeseries (recharts stacked BarChart, positive stacks above zero,
   negative below; consistent color per feature; legend).
 - Alerts page gains a "News Sentiment" strip above the alert list: one card per
-  /api/sentiment row (date, doc_id, label badge — red negative / grey neutral /
-  green positive — score to 2dp, confidence to 2dp).
+  /api/sentiment row (date, doc_id, label badge - red negative / grey neutral /
+  green positive - score to 2dp, confidence to 2dp).
 
 ## v3 additions
 
 ### POST /api/chat/stream
 Same request body as /api/chat. Response: Server-Sent Events (`text/event-stream`).
 Events, in order:
-- zero or more `event: tool` — `data: {"name": "get_shap_drivers", "status": "called"}` (one per tool invocation, lets the UI show "consulting store…")
-- one or more `event: delta` — `data: {"text": "..."}` incremental assistant text
-- terminal `event: done` — `data: {}`
-- on error: `event: error` — `data: {"detail": "..."}` then close. Missing key → single error event with detail "DEEPSEEK_API_KEY not configured".
+- zero or more `event: tool` - `data: {"name": "get_shap_drivers", "status": "called"}` (one per tool invocation, lets the UI show "consulting store…")
+- one or more `event: delta` - `data: {"text": "..."}` incremental assistant text
+- terminal `event: done` - `data: {}`
+- on error: `event: error` - `data: {"detail": "..."}` then close. Missing key → single error event with detail "DEEPSEEK_API_KEY not configured".
 Implementation: run the existing tool-hop loop non-streamed; stream only the final completion (stream=True on the last DeepSeek call, forwarding content deltas).
 
 ### Frontend v3
@@ -92,7 +92,7 @@ Implementation: run the existing tool-hop loop non-streamed; stream only the fin
 Returns `application/pdf` (Content-Disposition: attachment; filename="beyond_the_smile_<factor>_<model>.pdf").
 One-page branded tear sheet rendered server-side with matplotlib (UBS palette:
 red #E60000, dark grey #2E2E2E, mid grey #6A6A6A, grid #D9D9D9, white bg):
-- Header: "Beyond the Smile — UBS Fin AI Bootcamp", factor, model, generation date
+- Header: "Beyond the Smile - UBS Fin AI Bootcamp", factor, model, generation date
 - Panel 1: OOS realized vs forecast RV line chart (realized black, forecast red dashed)
 - Panel 2: latest-date top-8 SHAP drivers horizontal bar (positive red, negative grey)
 - Panel 3: OOS metrics table (QLIKE daily/week, Corr daily/week, n_oos) for HAR-X, GBM + baselines

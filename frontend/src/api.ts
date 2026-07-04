@@ -1,5 +1,5 @@
 // Typed API client for the Beyond the Smile backend (docs/API_CONTRACT.md).
-// All endpoints are relative "/api/..." — proxied by Vite to :8000 in dev.
+// All endpoints are relative "/api/..." - proxied by Vite to :8000 in dev.
 
 export interface ForecastPoint {
   date: string
@@ -103,7 +103,7 @@ async function request<T>(path: string, init?: RequestInit): Promise<T> {
       const body = await res.json()
       if (body && typeof body.detail === 'string') detail = body.detail
     } catch {
-      // non-JSON error body — keep statusText
+      // non-JSON error body - keep statusText
     }
     throw new ApiError(res.status, detail)
   }
@@ -202,11 +202,11 @@ export interface StreamChatCallbacks {
 }
 
 /**
- * Pure SSE frame parser — extracted for testability.
+ * Pure SSE frame parser - extracted for testability.
  *
  * Accepts an iterable of raw text chunks (as would come from a decoded
  * ReadableStream) and dispatches the appropriate callback for each complete
- * SSE frame. The public behaviour of streamChat is unchanged — it simply
+ * SSE frame. The public behaviour of streamChat is unchanged - it simply
  * delegates to this helper.
  *
  * @returns the leftover (incomplete) buffer after all complete frames have
@@ -223,7 +223,7 @@ export function parseSSEChunks(
 
     // SSE frames are separated by double newline
     const frames = buffer.split('\n\n')
-    // Last element may be an incomplete frame — keep it in the buffer
+    // Last element may be an incomplete frame - keep it in the buffer
     buffer = frames.pop() ?? ''
 
     for (const frame of frames) {
@@ -267,7 +267,7 @@ export function parseSSEChunks(
  * Stream a chat turn via POST /api/chat/stream.
  * Parses SSE frames from the ReadableStream manually.
  * Throws (rejects) only if the fetch itself fails or the response is not an
- * event-stream — callers should fall back to postChat in that case.
+ * event-stream - callers should fall back to postChat in that case.
  */
 export async function streamChat(
   messages: ChatMessage[],

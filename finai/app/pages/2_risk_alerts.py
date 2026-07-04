@@ -3,9 +3,9 @@ import streamlit as st
 from finai.app import data_access as da
 from finai.app import theme
 
-st.set_page_config(page_title="FinAI — Risk Alerts", layout="wide")
+st.set_page_config(page_title="FinAI - Risk Alerts", layout="wide")
 theme.inject(st)
-theme.topbar(st, "Risk alerts — generated daily UBS-style reports")
+theme.topbar(st, "Risk alerts - generated daily UBS-style reports")
 
 files = da.list_alert_files()
 if not files:

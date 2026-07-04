@@ -50,7 +50,7 @@ export default function Chat() {
           setStreamingContent(null)
           setToolStatus(null)
           if (detail === 'DEEPSEEK_API_KEY not configured') {
-            setError('Chat backend not configured — set DEEPSEEK_API_KEY')
+            setError('Chat backend not configured - set DEEPSEEK_API_KEY')
           } else {
             setError(detail)
           }
@@ -58,7 +58,7 @@ export default function Chat() {
       })
       streamSucceeded = true
     } catch {
-      // Streaming unavailable — fall back to non-streaming path
+      // Streaming unavailable - fall back to non-streaming path
       setStreamingContent(null)
       setToolStatus(null)
     }
@@ -70,7 +70,7 @@ export default function Chat() {
         setMessages([...next, { role: 'assistant', content: reply }])
       } catch (e) {
         if (e instanceof ApiError && e.status === 503) {
-          setError('Chat backend not configured — set DEEPSEEK_API_KEY')
+          setError('Chat backend not configured - set DEEPSEEK_API_KEY')
         } else {
           setError(e instanceof Error ? e.message : String(e))
         }

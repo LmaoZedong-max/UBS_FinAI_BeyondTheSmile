@@ -27,7 +27,7 @@ const METHODS = [
 ]
 
 function fmt3(v: number | null | undefined): string {
-  return v === null || v === undefined || Number.isNaN(v) ? '—' : v.toFixed(3)
+  return v === null || v === undefined || Number.isNaN(v) ? '-' : v.toFixed(3)
 }
 
 interface MetricCardProps {
@@ -95,7 +95,7 @@ export default function Overview() {
           <span className="text-ubs">Beyond</span> the Smile
         </h1>
         <p className="max-w-2xl text-sm leading-relaxed text-muted">
-          Decomposing the USD/CNY &amp; USD/CNH volatility surface — beyond ATM, beyond the smile
+          Decomposing the USD/CNY &amp; USD/CNH volatility surface - beyond ATM, beyond the smile
         </p>
         <p className="font-mono text-xs uppercase tracking-widest text-muted/60">
           UBS Fin AI Bootcamp
@@ -128,7 +128,7 @@ export default function Overview() {
           Live Metrics
           {factors.length > 0 && (
             <span className="ml-2 normal-case tracking-normal text-muted/60">
-              — {factors.find((f) => f.includes('CNH')) ?? factors[0]}
+              - {factors.find((f) => f.includes('CNH')) ?? factors[0]}
             </span>
           )}
         </h2>

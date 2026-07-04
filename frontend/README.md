@@ -1,4 +1,4 @@
-# Beyond the Smile — Frontend
+# Beyond the Smile - Frontend
 
 USD/CNY–CNH FX volatility research terminal for the UBS Fin AI Bootcamp.
 
@@ -22,8 +22,8 @@ npm run build   # type-checks then bundles to dist/
 
 ## Pages
 
-- `/terminal` — factor picker, realized vs HAR-X vs GBM volatility chart,
+- `/terminal` - factor picker, realized vs HAR-X vs GBM volatility chart,
   model evaluation table (QLIKE / Corr), SHAP driver bar chart with model
   toggle and date picker.
-- `/alerts` — NLP risk alert list with monospace reader pane.
-- `/chat` — research assistant chat (requires `DEEPSEEK_API_KEY` on the backend).
+- `/alerts` - NLP risk alert list with monospace reader pane.
+- `/chat` - research assistant chat (requires `DEEPSEEK_API_KEY` on the backend).
