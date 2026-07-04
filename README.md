@@ -62,6 +62,7 @@ Behind that sits a full research stack:
 | 📰 **News intelligence** | **FinBERT** sentiment scoring of curated CNY/CNH news, aligned to panel dates |
 | 🚨 **Risk alerts** | LLM-written, UBS-style daily reports - generated *only* from structured model output |
 | 💬 **Grounded chat** | Streaming DeepSeek assistant with tool-calling against the parquet store (SSE, token-by-token) |
+| 🔌 **OpenAI-compatible API** | The grounded analyst is exposed at `/v1/chat/completions` as model `beyond-the-smile` - plug in **Open WebUI** or any OpenAI client |
 | 📄 **Tear sheets** | One-click branded PDF per factor/model - chart, SHAP drivers, full model table |
 
 ## Architecture
@@ -74,7 +75,7 @@ flowchart LR
     D --> E["frontend/<br/>React · Vite · Tailwind<br/>Terminal · Alerts · Chat"]
     D -.tool calls.-> F["DeepSeek LLM"]
     F -.grounded answers.-> D
-    C --> G["finai/app<br/>Streamlit research UI"]
+    D --> H["Open WebUI<br/>chat client via /v1<br/>model: beyond-the-smile"]
 ```
 
 **No look-ahead, anywhere.** IS/OOS split at 2019-12-31: PCA loadings, AR(1) de-meaning, scaling constants, and every rolling model fit use only information available at the time of the forecast.
@@ -90,7 +91,7 @@ python3 -m venv ~/.venvs/beyond-the-smile
 cp .env.example .env          # add your DEEPSEEK_API_KEY
 
 # 3) everything, one command
-./scripts/dev.sh              # --with-streamlit for the research UI too
+./scripts/dev.sh              # add --with-openwebui for the chat client
 ```
 
 → **http://localhost:5173** - the terminal. **http://localhost:8000/docs** - the API.
@@ -102,7 +103,18 @@ echo "DEEPSEEK_API_KEY=sk-..." > .env
 docker compose up --build     # terminal at http://localhost:8080
 ```
 
-The backend image bakes the entire model store at build time - containers start instantly. The nginx layer proxies `/api` with SSE-safe streaming. No keys are ever baked into images.
+The backend image bakes the entire model store at build time - containers start instantly. The nginx layer proxies `/api` with SSE-safe streaming. No keys are ever baked into images. The compose stack also starts **Open WebUI at http://localhost:3000**, pre-wired to the `beyond-the-smile` model (auth disabled for demo).
+
+### 💬 Open WebUI chat client
+
+The backend speaks the OpenAI Chat Completions protocol at `/v1`, so Open WebUI works out of the box:
+
+```bash
+# local (needs Python 3.11+): python3.11 -m venv ~/.venvs/openwebui && ~/.venvs/openwebui/bin/pip install open-webui
+./scripts/dev.sh --with-openwebui     # Open WebUI at http://localhost:3000
+```
+
+The instance is branded "Beyond the Smile - UBS Fin AI Bootcamp" and defaults to the `beyond-the-smile` model - every answer is tool-grounded in the parquet store, with a "consulting data store" progress line streamed while it queries. For the fully UBS-styled experience, use the React terminal; Open WebUI adds chat history, multi-turn threads, and prompt management on top of the same grounded analyst.
 
 ## The terminal
 
@@ -124,8 +136,8 @@ The backend image bakes the entire model store at build time - containers start 
 ```
 finai/pipeline/   ingestion · PCA factors · vol models · SHAP · sentiment · alerts · CLI
 finai/store/      parquet output store (rebuilt by the pipeline; gitignored)
-finai/app/        Streamlit research UI + shared data access + chat tool layer
-backend/          FastAPI service (REST + SSE chat + PDF tear sheets)
+finai/app/        shared data access + chat tool layer (+ legacy Streamlit UI)
+backend/          FastAPI service (REST + SSE chat + /v1 OpenAI facade + PDF tear sheets)
 frontend/         React terminal (Vite · TypeScript · Tailwind · recharts)
 tests/            backend pytest suite
 docs/             API contract

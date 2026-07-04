@@ -482,3 +482,133 @@ class TestTearsheet:
     def test_404_bogus_factor(self, client: TestClient) -> None:
         r = client.get("/api/tearsheet?factor=BOGUS_FACTOR_XYZ&model=HAR-X")
         assert r.status_code == 404
+
+
+# ===========================================================================
+# OpenAI-compatible endpoints  (v5 / Open WebUI)
+# ===========================================================================
+
+class TestOpenAICompat:
+    """Tests for GET /v1/models and POST /v1/chat/completions."""
+
+    # -----------------------------------------------------------------------
+    # GET /v1/models
+    # -----------------------------------------------------------------------
+
+    def test_models_200(self, client: TestClient) -> None:
+        r = client.get("/v1/models")
+        assert r.status_code == 200
+        data = r.json()
+        assert data["object"] == "list"
+        assert isinstance(data["data"], list)
+        assert len(data["data"]) >= 1
+
+    def test_models_id_is_beyond_the_smile(self, client: TestClient) -> None:
+        r = client.get("/v1/models")
+        assert r.status_code == 200
+        assert r.json()["data"][0]["id"] == "beyond-the-smile"
+
+    # -----------------------------------------------------------------------
+    # POST /v1/chat/completions - missing API key -> 503
+    # -----------------------------------------------------------------------
+
+    def test_no_key_nonstream_503(
+        self, client: TestClient, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        monkeypatch.delenv("DEEPSEEK_API_KEY", raising=False)
+        r = client.post(
+            "/v1/chat/completions",
+            json={"model": "beyond-the-smile", "messages": [{"role": "user", "content": "hi"}], "stream": False},
+        )
+        assert r.status_code == 503
+        err = r.json()["error"]
+        assert err["code"] == "missing_api_key"
+
+    def test_no_key_stream_503(
+        self, client: TestClient, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        monkeypatch.delenv("DEEPSEEK_API_KEY", raising=False)
+        r = client.post(
+            "/v1/chat/completions",
+            json={"model": "beyond-the-smile", "messages": [{"role": "user", "content": "hi"}], "stream": True},
+        )
+        # stream=True with missing key returns a non-stream 503 error JSON
+        assert r.status_code == 503
+        err = r.json()["error"]
+        assert err["code"] == "missing_api_key"
+
+    # -----------------------------------------------------------------------
+    # POST /v1/chat/completions - stub client, non-stream
+    # -----------------------------------------------------------------------
+
+    def _make_stub_client(self) -> MagicMock:
+        """Same stub pattern as TestChatGeneratorUnit: tool call then plain text."""
+        _STUB_TEXT = "The HAR-X forecast was 0.538."
+
+        tc = MagicMock()
+        tc.id = "call_oai_abc"
+        tc.function.name = "get_shap_drivers"
+        tc.function.arguments = '{"date": "2025-12-16", "factor": "CNH_ATM_PC1"}'
+        tc.model_dump.return_value = {
+            "id": "call_oai_abc",
+            "type": "function",
+            "function": {"name": "get_shap_drivers", "arguments": tc.function.arguments},
+        }
+
+        first_msg = MagicMock()
+        first_msg.tool_calls = [tc]
+        first_msg.content = ""
+
+        first_resp = MagicMock()
+        first_resp.choices = [MagicMock(message=first_msg)]
+
+        second_msg = MagicMock()
+        second_msg.tool_calls = None
+        second_msg.content = _STUB_TEXT
+
+        second_resp = MagicMock()
+        second_resp.choices = [MagicMock(message=second_msg)]
+
+        stub = MagicMock()
+        stub.chat.completions.create.side_effect = [first_resp, second_resp]
+        return stub
+
+    def test_nonstream_200_with_stub(self, client: TestClient) -> None:
+        stub = self._make_stub_client()
+        with patch("finai.app.chat.get_client", return_value=stub):
+            r = client.post(
+                "/v1/chat/completions",
+                json={
+                    "model": "beyond-the-smile",
+                    "messages": [{"role": "user", "content": "What was the HAR-X forecast?"}],
+                    "stream": False,
+                },
+            )
+        assert r.status_code == 200
+        data = r.json()
+        assert data["object"] == "chat.completion"
+        content = data["choices"][0]["message"]["content"]
+        assert "0.538" in content, f"stub text not found in response: {content!r}"
+
+    # -----------------------------------------------------------------------
+    # POST /v1/chat/completions - stub client, streaming
+    # -----------------------------------------------------------------------
+
+    def test_stream_200_with_stub(self, client: TestClient) -> None:
+        stub = self._make_stub_client()
+        with patch("finai.app.chat.get_client", return_value=stub):
+            r = client.post(
+                "/v1/chat/completions",
+                json={
+                    "model": "beyond-the-smile",
+                    "messages": [{"role": "user", "content": "What was the HAR-X forecast?"}],
+                    "stream": True,
+                },
+            )
+        assert r.status_code == 200
+        body = r.content.decode()
+        assert "chat.completion.chunk" in body, (
+            f"expected 'chat.completion.chunk' in body: {body[:500]!r}"
+        )
+        assert "0.538" in body, f"stub text not found in stream body: {body[:500]!r}"
+        assert "data: [DONE]" in body, f"[DONE] sentinel not found in: {body[:500]!r}"

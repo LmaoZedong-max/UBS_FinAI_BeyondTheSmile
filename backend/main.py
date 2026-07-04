@@ -31,6 +31,10 @@ load_dotenv()
 
 app = FastAPI(title="Beyond the Smile - UBS Fin AI Bootcamp API")
 
+# Mount the OpenAI-compatible router (paths /v1/..., no /api prefix)
+from backend.openai_compat import openai_router  # noqa: E402
+app.include_router(openai_router)
+
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["http://localhost:5173"],

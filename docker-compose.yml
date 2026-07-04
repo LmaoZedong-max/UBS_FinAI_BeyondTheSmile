@@ -20,3 +20,26 @@ services:
     depends_on:
       - backend
     restart: unless-stopped
+
+  # Chat-native client: Open WebUI pointed at the backend's OpenAI-compatible
+  # /v1 facade - "beyond-the-smile" appears as a model whose answers are
+  # tool-grounded in the parquet store.
+  openwebui:
+    image: ghcr.io/open-webui/open-webui:main
+    ports:
+      - "3000:8080"
+    environment:
+      - OPENAI_API_BASE_URL=http://backend:8000/v1
+      - OPENAI_API_KEY=beyond-the-smile   # facade ignores it; must be non-empty
+      - WEBUI_NAME=Beyond the Smile - UBS Fin AI Bootcamp
+      - ENABLE_OLLAMA_API=false
+      - DEFAULT_MODELS=beyond-the-smile
+      - WEBUI_AUTH=false                  # single-user demo mode
+    depends_on:
+      - backend
+    volumes:
+      - openwebui-data:/app/backend/data
+    restart: unless-stopped
+
+volumes:
+  openwebui-data:

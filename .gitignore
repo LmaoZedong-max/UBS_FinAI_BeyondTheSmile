@@ -9,3 +9,5 @@ node_modules/
 frontend/dist/
 finai/store/*.parquet
 .claude/
+.webui_secret_key
+data/
