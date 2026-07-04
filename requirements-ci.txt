@@ -13,3 +13,4 @@ uvicorn
 eval_type_backport
 pytest
 httpx
+matplotlib

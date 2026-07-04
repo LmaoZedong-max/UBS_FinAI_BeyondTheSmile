@@ -17,7 +17,7 @@ import json as _json
 
 from fastapi import FastAPI, HTTPException, Query
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import StreamingResponse
+from fastapi.responses import Response, StreamingResponse
 from pydantic import BaseModel
 
 # ---------------------------------------------------------------------------
@@ -396,6 +396,33 @@ def alert_detail(date: str) -> AlertDetailResponse:
     if "error" in result:
         raise HTTPException(status_code=404, detail=result["error"])
     return AlertDetailResponse(date=result["date"], text=result["text"])
+
+
+_VALID_TEARSHEET_MODELS = {"HAR-X", "GBM"}
+
+
+@app.get("/api/tearsheet")
+def tearsheet(
+    factor: str = Query(...),
+    model: str = Query(...),
+) -> Response:
+    """Return a one-page branded PDF tear-sheet for the given factor and model."""
+    if model not in _VALID_TEARSHEET_MODELS:
+        raise HTTPException(status_code=422, detail="model must be 'HAR-X' or 'GBM'")
+
+    da = _import_da()
+    if factor not in da.available_factors():
+        raise HTTPException(status_code=404, detail=f"factor '{factor}' not found")
+
+    from backend.tearsheet import build_tearsheet_pdf  # noqa: PLC0415
+
+    pdf_bytes = build_tearsheet_pdf(factor=factor, model=model)
+    filename = f"beyond_the_smile_{factor}_{model}.pdf"
+    return Response(
+        content=pdf_bytes,
+        media_type="application/pdf",
+        headers={"Content-Disposition": f'attachment; filename="{filename}"'},
+    )
 
 
 @app.post("/api/chat", response_model=ChatResponse)

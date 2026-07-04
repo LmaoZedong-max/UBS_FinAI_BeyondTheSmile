@@ -450,3 +450,35 @@ class TestChatGeneratorUnit:
         assert stub.chat.completions.create.call_count == 2, (
             f"expected 2 create() calls, got {stub.chat.completions.create.call_count}"
         )
+
+
+# ===========================================================================
+# GET /api/tearsheet  (v4)
+# ===========================================================================
+
+class TestTearsheet:
+    def test_200_pdf_for_cnh_atm_pc1_harx(self, client: TestClient) -> None:
+        r = client.get(f"/api/tearsheet?factor={FACTOR}&model=HAR-X")
+        assert r.status_code == 200, f"expected 200, got {r.status_code}: {r.text}"
+        assert "application/pdf" in r.headers.get("content-type", ""), (
+            f"expected application/pdf content-type, got {r.headers.get('content-type')!r}"
+        )
+        assert r.content[:4] == b"%PDF", (
+            f"body does not start with %PDF: {r.content[:20]!r}"
+        )
+
+    def test_content_disposition_contains_factor(self, client: TestClient) -> None:
+        r = client.get(f"/api/tearsheet?factor={FACTOR}&model=HAR-X")
+        assert r.status_code == 200
+        cd = r.headers.get("content-disposition", "")
+        assert FACTOR in cd, (
+            f"Content-Disposition {cd!r} does not contain factor {FACTOR!r}"
+        )
+
+    def test_422_bad_model(self, client: TestClient) -> None:
+        r = client.get(f"/api/tearsheet?factor={FACTOR}&model=BADMODEL")
+        assert r.status_code == 422
+
+    def test_404_bogus_factor(self, client: TestClient) -> None:
+        r = client.get("/api/tearsheet?factor=BOGUS_FACTOR_XYZ&model=HAR-X")
+        assert r.status_code == 404

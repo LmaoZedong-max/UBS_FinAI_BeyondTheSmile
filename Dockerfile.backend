@@ -28,7 +28,8 @@ RUN pip install --no-cache-dir \
     "uvicorn[standard]" \
     eval_type_backport \
     requests \
-    httpx
+    httpx \
+    matplotlib
 
 # Copy application source
 COPY finai/ finai/

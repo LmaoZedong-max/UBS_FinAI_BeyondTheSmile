@@ -85,3 +85,21 @@ Implementation: run the existing tool-hop loop non-streamed; stream only the fin
 - Chat page uses /api/chat/stream via fetch + ReadableStream (POST body, parse SSE frames manually).
 - Assistant bubble renders deltas incrementally; while tool events arrive show a muted "consulting data store…" status line above the bubble.
 - On error event render the detail in the existing error style. Keep POST /api/chat code as fallback if stream fails to open.
+
+## v4 additions
+
+### GET /api/tearsheet?factor=CNH_ATM_PC1&model=HAR-X
+Returns `application/pdf` (Content-Disposition: attachment; filename="beyond_the_smile_<factor>_<model>.pdf").
+One-page branded tear sheet rendered server-side with matplotlib (UBS palette:
+red #E60000, dark grey #2E2E2E, mid grey #6A6A6A, grid #D9D9D9, white bg):
+- Header: "Beyond the Smile — UBS Fin AI Bootcamp", factor, model, generation date
+- Panel 1: OOS realized vs forecast RV line chart (realized black, forecast red dashed)
+- Panel 2: latest-date top-8 SHAP drivers horizontal bar (positive red, negative grey)
+- Panel 3: OOS metrics table (QLIKE daily/week, Corr daily/week, n_oos) for HAR-X, GBM + baselines
+- Footer: latest news sentiment line if available (date, label, score) + "Source: internal analysis."
+422 bad model; 404 unknown factor.
+
+### Frontend v4
+Terminal page header row gains a red-outline "Export tear sheet (PDF)" button that
+downloads /api/tearsheet for the currently selected factor + SHAP model toggle
+(plain <a href> or fetch->blob; show nothing fancy, just the download).

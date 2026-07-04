@@ -198,7 +198,7 @@ export default function Terminal() {
   return (
     <div className="space-y-4 p-5">
       {/* Factor selector row */}
-      <div className="flex items-center gap-3">
+      <div className="flex items-center gap-3 flex-wrap">
         <label className="text-xs font-semibold uppercase tracking-widest text-muted">
           Vol Factor
         </label>
@@ -219,6 +219,15 @@ export default function Terminal() {
           <span className="font-mono text-xs text-muted">
             backend unreachable — {factorsError}
           </span>
+        )}
+        {factor && (
+          <a
+            href={`/api/tearsheet?factor=${encodeURIComponent(factor)}&model=${encodeURIComponent(shapModel)}`}
+            download
+            className="rounded-sm border border-ubs px-5 py-2.5 font-mono text-xs uppercase tracking-widest text-ubs transition-colors hover:bg-ubs hover:text-white"
+          >
+            Export tear sheet (PDF)
+          </a>
         )}
       </div>
 
