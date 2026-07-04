@@ -4,25 +4,24 @@ UBS Professional Risk Alerts — Panel Date: 2025-10-28
 ==========================================================================================
 DOC: news5_1028 | news_date=2025-10-28 | panel_date=2025-10-28
 ==========================================================================================
-## PROFESSIONAL RISK ALERT: USD/CNH
+**Professional Risk Alert: USD/CNH**
+**Date:** 2025-10-28
 
-1. Executive Summary:
-- Market Regime: Calm (justified by a low sum of macro contributions to predicted volatility at 0.04, with no evidence of elevated skew or basis spread z-scores; volatility signals are muted).
-- Dominant Risk Driver: The largest HAR-X macro contributor is Brent crude returns (+0.026), suggesting energy market developments are currently the most significant driver of USD/CNH volatility.
+**1. Executive Summary**
+USD/CNH is under a **negative sentiment regime** (confidence: 94.9%) with a sentiment score of -0.91. The aggregate macro contribution to predicted log realized volatility is **+0.039**, driven primarily by Brent crude oil returns and a rise in China’s 2-year yield. The offshore yuan strengthened to a one-month high of 7.1015, supported by a stronger-than-expected PBZ midpoint fix (7.0881 vs. estimate 7.1146) and trade-deal optimism.
 
-2. Cross-Asset & Volatility Narrative:
-- Quantitative Signals:
-  - Aggregate macro model contribution to predicted volatility is low at 0.04, indicating a subdued risk environment.
-  - Brent crude returns contribute +0.026 to predicted log-realized volatility, the highest among macro drivers.
-  - China 2-year yield changes add +0.021, while CSI 300 equity returns contribute negatively at -0.020.
-  - No available skew or basis spread z-scores (“N/A”).
-- Macro & News Context:
-  - News sentiment is negative (label: negative, sentiment score: -0.91, confidence: 0.95), despite recent CNH strength.
-  - The PBoC set the yuan midpoint stronger than expected at 7.0881, supporting CNH to a one-month high of 7.1015.
-  - Optimism over a potential US-China trade deal has boosted risk appetite, reducing demand for USD.
-  - Central bank meetings (Fed, BoC, ECB, BoJ) and US government shutdown developments are key forward-looking risks, but recent FX moves have been muted.
+**2. Cross-Asset & Volatility Narrative**
+The top macro drivers of predicted volatility are:
+- **RET_DRV_BRENT** (+0.026): Rising oil prices are contributing to CNH volatility.
+- **CHG_DRV_CN_2Y_YLD_bps** (+0.021): A rise in China’s 2-year yield is a key volatility contributor.
+- **RET_DRV_CSI_300** (-0.020): A decline in Chinese equities is dampening volatility.
+- **RET_CNY_SPOT** (+0.014): Spot CNH movement is a direct volatility source.
+- **RET_DRV_DXY_US_DOLLAR_INDEX** (-0.011): A weaker DXY is reducing USD/CNH volatility.
 
-3. Positioning Considerations (Illustrative):
-- Consider risk-controlled structures that benefit from continued CNH stability or mild appreciation, such as range accruals or short-dated USD/CNH spreads, in scenarios where trade optimism and PBoC policy support persist.
-  - This positioning may benefit if the calm regime endures and CNH remains supported by policy and positive trade developments.
-  - Key risks include a reversal in trade sentiment, unexpected central bank actions, or renewed volatility from energy markets, which could disrupt the current calm regime.
+The dollar index fell 0.11% to 98.84. The PBZ set the yuan midpoint at 7.0881, the strongest since Oct 15, 2024, and above the Reuters estimate of 7.1146. This, combined with Trump-Xi trade deal optimism, boosted CNH. The CNH ATM volatility factor (PC1) is the relevant IV factor.
+
+**3. Positioning Considerations (Illustrative)**
+- **Sentiment Signal:** Negative on USD/CNH (sent_signal: 1), indicating bearish USD bias.
+- **Key Event Risk:** This week’s central bank meetings (Fed, BoC, ECB, BoJ) and the Trump-Xi meeting in South Korea are critical. A Fed rate cut is priced in, but focus is on QT guidance.
+- **Volatility Outlook:** Elevated macro contributions (+0.039) suggest heightened near-term volatility. The PBZ fix and trade headlines are the primary catalysts.
+- **Risk:** A breakdown in trade talks or a hawkish Fed surprise could reverse CNH gains. The U.S. government shutdown (day 27) adds macro uncertainty.
