@@ -202,34 +202,24 @@ export interface StreamChatCallbacks {
 }
 
 /**
- * Stream a chat turn via POST /api/chat/stream.
- * Parses SSE frames from the ReadableStream manually.
- * Throws (rejects) only if the fetch itself fails or the response is not an
- * event-stream — callers should fall back to postChat in that case.
+ * Pure SSE frame parser — extracted for testability.
+ *
+ * Accepts an iterable of raw text chunks (as would come from a decoded
+ * ReadableStream) and dispatches the appropriate callback for each complete
+ * SSE frame. The public behaviour of streamChat is unchanged — it simply
+ * delegates to this helper.
+ *
+ * @returns the leftover (incomplete) buffer after all complete frames have
+ *   been processed, so callers can carry it forward across chunk boundaries.
  */
-export async function streamChat(
-  messages: ChatMessage[],
+export function parseSSEChunks(
+  chunks: string[],
   callbacks: StreamChatCallbacks,
-): Promise<void> {
-  const res = await fetch('/api/chat/stream', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ messages }),
-  })
-
-  if (!res.ok || !res.body || !res.headers.get('content-type')?.includes('text/event-stream')) {
-    // Signal to caller that streaming is unavailable
-    throw new Error(`stream unavailable: ${res.status} ${res.statusText}`)
-  }
-
-  const reader = res.body.getReader()
-  const decoder = new TextDecoder()
-  let buffer = ''
-
-  while (true) {
-    const { value, done } = await reader.read()
-    if (done) break
-    buffer += decoder.decode(value, { stream: true })
+  initialBuffer = '',
+): string {
+  let buffer = initialBuffer
+  for (const chunk of chunks) {
+    buffer += chunk
 
     // SSE frames are separated by double newline
     const frames = buffer.split('\n\n')
@@ -269,5 +259,39 @@ export async function streamChat(
         callbacks.onError(typeof payload.detail === 'string' ? payload.detail : 'Unknown error')
       }
     }
+  }
+  return buffer
+}
+
+/**
+ * Stream a chat turn via POST /api/chat/stream.
+ * Parses SSE frames from the ReadableStream manually.
+ * Throws (rejects) only if the fetch itself fails or the response is not an
+ * event-stream — callers should fall back to postChat in that case.
+ */
+export async function streamChat(
+  messages: ChatMessage[],
+  callbacks: StreamChatCallbacks,
+): Promise<void> {
+  const res = await fetch('/api/chat/stream', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ messages }),
+  })
+
+  if (!res.ok || !res.body || !res.headers.get('content-type')?.includes('text/event-stream')) {
+    // Signal to caller that streaming is unavailable
+    throw new Error(`stream unavailable: ${res.status} ${res.statusText}`)
+  }
+
+  const reader = res.body.getReader()
+  const decoder = new TextDecoder()
+  let buffer = ''
+
+  while (true) {
+    const { value, done } = await reader.read()
+    if (done) break
+    const chunk = decoder.decode(value, { stream: true })
+    buffer = parseSSEChunks([chunk], callbacks, buffer)
   }
 }
