@@ -48,3 +48,24 @@ Implementation: reuse the tool-calling loop from `finai/app/chat.py` (`run_chat_
 - Dev server: Vite on :5173, proxy `/api` → `http://localhost:8000`.
 - Pages: **Terminal** (dashboard: factor picker, vol line chart realized/HAR-X/GBM, SHAP horizontal bar chart with model toggle + date picker, eval table), **Risk Alerts** (list + reader), **Chat** (persistent panel or page).
 - Theme: dark (#111315 bg, #1B1E21 panels), UBS red #E60000 accents, white text; top bar shows "Beyond the Smile" with subtitle "UBS Fin AI Bootcamp".
+
+## v2 additions
+
+### GET /api/shap/timeseries?factor=CNH_ATM_PC1&model=HAR-X&top_k=6&freq=M
+Monthly (freq=M) mean SHAP contribution per feature, macro drivers only (exclude
+log_rv_d/log_rv_w/log_rv_m core terms). Keep the top_k features by mean |value|
+across the window; sum the remainder into "Other".
+```json
+{"factor": "...", "model": "HAR-X", "freq": "M",
+ "features": ["CHG_DRV_VIX_bps", ..., "Other"],
+ "series": [{"period": "2020-01", "values": {"CHG_DRV_VIX_bps": 0.01, ..., "Other": -0.003}}, ...]}
+```
+422 on bad model; empty series if no data.
+
+### Frontend v2
+- Terminal page gains an "Attribution" panel: signed stacked monthly bar chart of
+  /api/shap/timeseries (recharts stacked BarChart, positive stacks above zero,
+  negative below; consistent color per feature; legend).
+- Alerts page gains a "News Sentiment" strip above the alert list: one card per
+  /api/sentiment row (date, doc_id, label badge — red negative / grey neutral /
+  green positive — score to 2dp, confidence to 2dp).

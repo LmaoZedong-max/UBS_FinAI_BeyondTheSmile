@@ -112,6 +112,19 @@ class AlertDetailResponse(BaseModel):
     text: str
 
 
+class ShapTimeseriesPeriod(BaseModel):
+    period: str
+    values: dict[str, float]
+
+
+class ShapTimeseriesResponse(BaseModel):
+    factor: str
+    model: str
+    freq: str
+    features: list[str]
+    series: list[ShapTimeseriesPeriod]
+
+
 class ChatMessage(BaseModel):
     role: str
     content: str
@@ -223,6 +236,70 @@ def eval_metrics(factor: str = Query(...)) -> EvalResponse:
         for _, row in sub.iterrows()
     ]
     return EvalResponse(factor=factor, rows=rows)
+
+
+_CORE_RV_FEATURES = {"log_rv_d", "log_rv_w", "log_rv_m"}
+_VALID_MODELS = {"HAR-X", "GBM"}
+
+
+@app.get("/api/shap/timeseries", response_model=ShapTimeseriesResponse)
+def shap_timeseries(
+    factor: str = Query(...),
+    model: str = Query(...),
+    top_k: int = Query(default=6),
+    freq: str = Query(default="M"),
+) -> ShapTimeseriesResponse:
+    import math
+    import pandas as pd
+
+    if model not in _VALID_MODELS:
+        raise HTTPException(status_code=422, detail="model must be 'HAR-X' or 'GBM'")
+
+    da = _import_da()
+    df = da.shap_values()
+
+    if df.empty:
+        return ShapTimeseriesResponse(factor=factor, model=model, freq=freq, features=[], series=[])
+
+    # Filter to requested factor + model, exclude core RV features
+    sub = df[(df["factor"] == factor) & (df["model"] == model)]
+    sub = sub[~sub["feature"].isin(_CORE_RV_FEATURES)].copy()
+
+    if sub.empty:
+        return ShapTimeseriesResponse(factor=factor, model=model, freq=freq, features=[], series=[])
+
+    # Ensure date is datetime
+    sub["date"] = pd.to_datetime(sub["date"])
+
+    # Pivot to (date x feature)
+    pivoted = sub.pivot_table(index="date", columns="feature", values="shap_value", aggfunc="mean")
+
+    # Resample monthly (mean)
+    monthly = pivoted.resample("ME").mean()
+
+    # Rank features by mean |monthly value| across all periods
+    mean_abs = monthly.abs().mean(axis=0).sort_values(ascending=False)
+    top_features = mean_abs.index[:top_k].tolist()
+    other_features = mean_abs.index[top_k:].tolist()
+
+    # Build result columns
+    result_df = monthly[top_features].copy()
+    if other_features:
+        result_df["Other"] = monthly[other_features].sum(axis=1)
+
+    features = top_features + (["Other"] if other_features else [])
+
+    # Build series
+    series: list[ShapTimeseriesPeriod] = []
+    for ts, row in result_df.iterrows():
+        period = ts.strftime("%Y-%m")
+        values: dict[str, float] = {}
+        for feat in features:
+            v = row.get(feat, float("nan"))
+            values[feat] = 0.0 if (v is None or (isinstance(v, float) and math.isnan(v))) else float(v)
+        series.append(ShapTimeseriesPeriod(period=period, values=values))
+
+    return ShapTimeseriesResponse(factor=factor, model=model, freq=freq, features=features, series=series)
 
 
 @app.get("/api/shap/dates", response_model=ShapDatesResponse)

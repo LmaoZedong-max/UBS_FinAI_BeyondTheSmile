@@ -41,6 +41,34 @@ export interface ShapResponse {
   drivers: ShapDriver[]
 }
 
+// --- SHAP timeseries (v2) ---
+export interface ShapTimeseriesPoint {
+  period: string
+  values: Record<string, number>
+}
+
+export interface ShapTimeseriesResponse {
+  factor: string
+  model: ShapModel
+  freq: string
+  features: string[]
+  series: ShapTimeseriesPoint[]
+}
+
+// --- Sentiment (v2) ---
+export interface SentimentRow {
+  date: string
+  doc_id: string
+  label: string
+  sent_score: number
+  confidence: number
+}
+
+export interface SentimentResponse {
+  rows: SentimentRow[]
+}
+
+// --- Alerts ---
 export interface AlertMeta {
   date: string
   filename: string
@@ -135,6 +163,20 @@ export async function getAlerts(): Promise<AlertMeta[]> {
 
 export function getAlert(date: string): Promise<AlertDetail> {
   return request(`/api/alerts/${date}`)
+}
+
+export function getShapTimeseries(
+  factor: string,
+  model: ShapModel,
+  top_k = 6,
+  freq = 'M',
+): Promise<ShapTimeseriesResponse> {
+  return request(`/api/shap/timeseries${qs({ factor, model, top_k, freq })}`)
+}
+
+export async function getSentiment(): Promise<SentimentRow[]> {
+  const data = await request<SentimentResponse>('/api/sentiment')
+  return data.rows
 }
 
 export async function postChat(messages: ChatMessage[]): Promise<string> {

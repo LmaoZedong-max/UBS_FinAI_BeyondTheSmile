@@ -19,11 +19,13 @@ import {
   getForecasts,
   getShap,
   getShapDates,
+  getShapTimeseries,
   ApiError,
   type EvalRow,
   type ForecastPoint,
   type ShapDriver,
   type ShapModel,
+  type ShapTimeseriesPoint,
 } from '../api'
 import { EmptyNote, ErrorNote, Panel, Spinner, selectClass } from '../components/ui'
 
@@ -33,6 +35,24 @@ const COLORS = {
   gbm: '#8A8D90',
   grid: '#2A2D30',
   muted: '#6A6A6A',
+}
+
+// Attribution panel — stable color palette per feature slot.
+// Slot 0 = UBS red (first driver), then muted grey tones, "Other" darkest.
+const ATTRIB_PALETTE = [
+  '#E60000', // UBS red — most impactful driver
+  '#8A8D90',
+  '#6A6A6A',
+  '#AEAEAE',
+  '#4A4A4A',
+  '#C8C8C8',
+  '#3A3A3A', // "Other" — darkest grey
+]
+
+function attribColor(index: number, total: number): string {
+  // Always assign the last palette entry to the last feature ("Other" if present)
+  if (index === total - 1 && total > 1) return ATTRIB_PALETTE[ATTRIB_PALETTE.length - 1]
+  return ATTRIB_PALETTE[Math.min(index, ATTRIB_PALETTE.length - 2)]
 }
 
 function fmt(v: number | null | undefined): string {
@@ -68,6 +88,12 @@ export default function Terminal() {
   const [drivers, setDrivers] = useState<ShapDriver[]>([])
   const [shapLoading, setShapLoading] = useState(false)
   const [shapError, setShapError] = useState('')
+
+  // Attribution timeseries state
+  const [attribFeatures, setAttribFeatures] = useState<string[]>([])
+  const [attribSeries, setAttribSeries] = useState<ShapTimeseriesPoint[]>([])
+  const [attribLoading, setAttribLoading] = useState(false)
+  const [attribError, setAttribError] = useState('')
 
   useEffect(() => {
     getFactors()
@@ -130,9 +156,43 @@ export default function Terminal() {
       .finally(() => setShapLoading(false))
   }, [factor, shapDate, shapModel])
 
+  // Fetch attribution timeseries whenever factor or model changes
+  useEffect(() => {
+    if (!factor) return
+    setAttribLoading(true)
+    setAttribError('')
+    getShapTimeseries(factor, shapModel)
+      .then((r) => {
+        setAttribFeatures(r.features)
+        setAttribSeries(r.series)
+      })
+      .catch((e) => {
+        setAttribFeatures([])
+        setAttribSeries([])
+        setAttribError(
+          e instanceof ApiError && e.status === 404
+            ? 'Attribution endpoint not yet available.'
+            : e instanceof Error
+              ? e.message
+              : String(e),
+        )
+      })
+      .finally(() => setAttribLoading(false))
+  }, [factor, shapModel])
+
   const shapChartData = useMemo(
     () => [...drivers].reverse(), // largest |shap| at top of horizontal chart
     [drivers],
+  )
+
+  // Flatten attrib series into recharts row objects: { period, feature1: v, feature2: v, ... }
+  const attribChartData = useMemo(
+    () =>
+      attribSeries.map((pt) => ({
+        period: pt.period,
+        ...pt.values,
+      })),
+    [attribSeries],
   )
 
   return (
@@ -352,6 +412,61 @@ export default function Terminal() {
           )}
         </Panel>
       </div>
+
+      {/* Attribution panel — monthly mean SHAP (macro drivers) */}
+      <Panel title="Attribution — monthly mean SHAP (macro drivers)">
+        {attribLoading ? (
+          <Spinner label="Loading attribution…" />
+        ) : attribError ? (
+          <ErrorNote message={attribError} />
+        ) : attribChartData.length === 0 ? (
+          <EmptyNote message="No attribution data for this selection." />
+        ) : (
+          <div className="h-72">
+            <ResponsiveContainer width="100%" height="100%">
+              <BarChart
+                data={attribChartData}
+                margin={{ top: 5, right: 20, bottom: 5, left: 10 }}
+                stackOffset="sign"
+              >
+                <CartesianGrid stroke={COLORS.grid} strokeDasharray="3 3" vertical={false} />
+                <XAxis
+                  dataKey="period"
+                  tick={{ fill: COLORS.muted, fontSize: 11, fontFamily: 'monospace' }}
+                  stroke={COLORS.grid}
+                  minTickGap={40}
+                />
+                <YAxis
+                  tick={{ fill: COLORS.muted, fontSize: 11, fontFamily: 'monospace' }}
+                  stroke={COLORS.grid}
+                  width={60}
+                  tickFormatter={(v: number) => v.toFixed(3)}
+                />
+                <Tooltip
+                  cursor={{ fill: '#2A2D3033' }}
+                  contentStyle={tooltipStyle}
+                  labelStyle={{ color: '#ECECEC' }}
+                  formatter={(value) =>
+                    typeof value === 'number' ? value.toFixed(4) : '—'
+                  }
+                />
+                <Legend wrapperStyle={{ fontSize: 11, fontFamily: 'monospace' }} />
+                <ReferenceLine y={0} stroke={COLORS.muted} />
+                {attribFeatures.map((feat, i) => (
+                  <Bar
+                    key={feat}
+                    dataKey={feat}
+                    stackId="attrib"
+                    fill={attribColor(i, attribFeatures.length)}
+                    name={feat}
+                    isAnimationActive={false}
+                  />
+                ))}
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
+        )}
+      </Panel>
     </div>
   )
 }
