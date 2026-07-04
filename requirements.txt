@@ -12,6 +12,9 @@ requests
 openai
 python-dotenv
 pyarrow
+fastapi
+uvicorn[standard]
+eval_type_backport
 matplotlib
 plotly
 pytest
