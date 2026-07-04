@@ -2,6 +2,18 @@ import { NavLink, Outlet } from 'react-router-dom'
 
 const NAV = [
   {
+    to: '/',
+    label: 'Overview',
+    icon: (
+      <svg viewBox="0 0 16 16" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="1.4">
+        <rect x="1.5" y="1.5" width="5" height="5" rx="0.5" />
+        <rect x="9.5" y="1.5" width="5" height="5" rx="0.5" />
+        <rect x="1.5" y="9.5" width="5" height="5" rx="0.5" />
+        <rect x="9.5" y="9.5" width="5" height="5" rx="0.5" />
+      </svg>
+    ),
+  },
+  {
     to: '/terminal',
     label: 'Terminal',
     icon: (
@@ -59,6 +71,7 @@ export default function Layout() {
             <NavLink
               key={item.to}
               to={item.to}
+              end={item.to === '/'}
               className={({ isActive }) =>
                 `flex items-center gap-2.5 rounded-sm border-l-2 px-3 py-2 text-sm transition-colors ${
                   isActive
