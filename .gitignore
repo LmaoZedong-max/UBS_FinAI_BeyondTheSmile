@@ -1,0 +1,11 @@
+.env
+.venv/
+venv/
+__pycache__/
+*.pyc
+.DS_Store
+.ipynb_checkpoints/
+node_modules/
+frontend/dist/
+finai/store/*.parquet
+.claude/

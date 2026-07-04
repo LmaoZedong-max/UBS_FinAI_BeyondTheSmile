@@ -1,0 +1,28 @@
+UBS Professional Risk Alerts — Panel Date: 2025-10-28
+
+
+==========================================================================================
+DOC: news5_1028 | news_date=2025-10-28 | panel_date=2025-10-28
+==========================================================================================
+## PROFESSIONAL RISK ALERT: USD/CNH
+
+1. Executive Summary:
+- Market Regime: Calm (justified by a low sum of macro contributions to predicted volatility at 0.04, with no evidence of elevated skew or basis spread z-scores; volatility signals are muted).
+- Dominant Risk Driver: The largest HAR-X macro contributor is Brent crude returns (+0.026), suggesting energy market developments are currently the most significant driver of USD/CNH volatility.
+
+2. Cross-Asset & Volatility Narrative:
+- Quantitative Signals:
+  - Aggregate macro model contribution to predicted volatility is low at 0.04, indicating a subdued risk environment.
+  - Brent crude returns contribute +0.026 to predicted log-realized volatility, the highest among macro drivers.
+  - China 2-year yield changes add +0.021, while CSI 300 equity returns contribute negatively at -0.020.
+  - No available skew or basis spread z-scores (“N/A”).
+- Macro & News Context:
+  - News sentiment is negative (label: negative, sentiment score: -0.91, confidence: 0.95), despite recent CNH strength.
+  - The PBoC set the yuan midpoint stronger than expected at 7.0881, supporting CNH to a one-month high of 7.1015.
+  - Optimism over a potential US-China trade deal has boosted risk appetite, reducing demand for USD.
+  - Central bank meetings (Fed, BoC, ECB, BoJ) and US government shutdown developments are key forward-looking risks, but recent FX moves have been muted.
+
+3. Positioning Considerations (Illustrative):
+- Consider risk-controlled structures that benefit from continued CNH stability or mild appreciation, such as range accruals or short-dated USD/CNH spreads, in scenarios where trade optimism and PBoC policy support persist.
+  - This positioning may benefit if the calm regime endures and CNH remains supported by policy and positive trade developments.
+  - Key risks include a reversal in trade sentiment, unexpected central bank actions, or renewed volatility from energy markets, which could disrupt the current calm regime.

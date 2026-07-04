@@ -1,0 +1,59 @@
+UBS Professional Risk Alerts — Panel Date: 2025-12-22
+
+
+==========================================================================================
+DOC: news3_1223 | news_date=2025-12-23 | panel_date=2025-12-22
+==========================================================================================
+## PROFESSIONAL RISK ALERT: USD/CNH
+
+1. Executive Summary:
+- Market Regime: Calm (sum of macro contributions to predicted volatility is 0.16, indicating a low-volatility environment; no evidence of stress from available indicators).
+- Dominant Risk Driver: The largest HAR-X macro contributor is the change in China 2-year yield (+0.09), suggesting local rates are the primary driver of realized volatility.
+
+2. Cross-Asset & Volatility Narrative:
+- Quantitative Signals:
+  - Aggregate macro model contribution to predicted log-realized volatility is 0.16, consistent with a calm regime.
+  - The top volatility driver is the change in China 2-year yield (contribution: +0.09).
+  - Other notable contributors include Brent returns (-0.04), VIX changes (+0.03), CSI 300 returns (+0.02), and SGD returns (+0.02).
+  - Skew and basis spread z-scores are unavailable (N/A).
+- Macro & News Context:
+  - News sentiment is positive (label: positive, sentiment score: 0.68, confidence: 0.75).
+  - Investment houses broadly expect gradual CNY appreciation, with forecasts for USD/CNY ranging between 6.70 and 7.10 for 2025–2026.
+  - Yield differentials narrowing and easing US-China trade tensions are cited as supportive for CNY strength.
+  - The PBOC is expected to maintain currency stability, with low volatility anticipated barring major policy shifts.
+
+3. Positioning Considerations (Illustrative):
+- Consider risk-controlled structures that benefit from a stable or modestly appreciating CNH scenario, such as range accruals or calendar spreads, which may perform if realized volatility remains low and USD/CNH trades within the 6.90–7.10 range.
+  - This approach may benefit from continued policy stability and positive sentiment toward the yuan.
+  - Key risk: A shift in macro regime (e.g., renewed US-China tensions, unexpected policy changes, or a sharp move in China rates) could increase volatility and move USD/CNH outside the anticipated range.
+- Alternatively, structures with limited downside that monetize low volatility (e.g., short-dated risk reversals with defined risk) may be considered, given the calm regime and positive sentiment.
+  - Key risk: A sudden spike in volatility or a break of the 7.00 level in either direction could reduce the effectiveness of such strategies.
+
+
+==========================================================================================
+DOC: news4_1223 | news_date=2025-12-23 | panel_date=2025-12-22
+==========================================================================================
+## PROFESSIONAL RISK ALERT: USD/CNH
+
+1. Executive Summary:
+- Market Regime: Calm (sum_macro_contrib at 0.16 is low, indicating limited macro-driven volatility; no evidence of stress in available volatility or spread metrics)
+- Dominant Risk Driver: The largest HAR-X macro contributor is the rise in China 2Y yields (+0.09), suggesting local rates are the primary volatility input.
+
+2. Cross-Asset & Volatility Narrative:
+- Quantitative Signals:
+  - Aggregate macro model contribution to predicted volatility is 0.16, indicating a subdued risk environment.
+  - The top macro driver is the change in China 2Y yields (+0.09 contribution to predicted log-realized volatility).
+  - Brent returns exert a modest dampening effect (-0.04), while VIX changes (+0.03) and CSI 300 returns (+0.02) provide minor positive contributions.
+- Macro & News Context:
+  - News sentiment is negative (label: negative, sentiment score: -0.91, confidence: 0.94), reflecting exporter concerns over yuan strength.
+  - Exporters are accelerating FX conversions as the yuan appreciates, with the offshore rate reaching a 14-month high (7.0305 as of Dec. 23).
+  - The rally is attributed to a weaker US Dollar Index post-Fed and seasonal year-end conversion flows.
+  - Market consensus expects continued yuan firmness but limited further appreciation, with the PBoC expected to manage sharp moves.
+
+3. Positioning Considerations (Illustrative):
+- Consideration 1: Structures that benefit from continued yuan stability or gradual appreciation (e.g., risk-controlled participation in CNH strength) may be appropriate if the calm regime persists and year-end conversion flows remain supportive.
+  - Scenario: Benefits if USD/CNH remains range-bound or trends modestly lower.
+  - Key Risk: A reversal in US dollar sentiment or unexpected PBoC intervention could limit further CNH gains or induce volatility.
+- Consideration 2: Spreads or collars that provide downside protection against a sudden reversal in USD/CNH may be considered, given exporter sensitivity and negative sentiment.
+  - Scenario: Provides risk mitigation if the calm regime does not hold and volatility rises.
+  - Key Risk: Opportunity cost if USD/CNH remains stable and protection is not needed.

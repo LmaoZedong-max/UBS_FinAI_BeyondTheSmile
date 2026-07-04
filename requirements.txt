@@ -1,0 +1,16 @@
+pandas
+numpy
+scikit-learn
+statsmodels
+scipy
+lightgbm
+shap
+streamlit
+transformers
+torch
+requests
+openai
+python-dotenv
+pyarrow
+matplotlib
+plotly
