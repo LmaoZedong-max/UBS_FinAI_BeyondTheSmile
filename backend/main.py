@@ -15,10 +15,15 @@ from typing import Any
 
 import json as _json
 
+from dotenv import load_dotenv
 from fastapi import FastAPI, HTTPException, Query
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import Response, StreamingResponse
 from pydantic import BaseModel
+
+# Load .env (DEEPSEEK_API_KEY) before any endpoint checks os.environ —
+# the lazy llm_client import would otherwise load it too late.
+load_dotenv()
 
 # ---------------------------------------------------------------------------
 # App setup

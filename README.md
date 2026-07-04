@@ -1,83 +1,120 @@
-# UBS_FinAI_BeyondTheSmile
+<div align="center">
 
-**Beyond the Smile — UBS Fin AI Bootcamp**
+# 📈 Beyond the Smile
 
-Quant research stack for USD/CNY & USD/CNH FX implied-volatility surfaces:
-PCA factor extraction → rolling HAR-X / GBM vol forecasts → SHAP driver
-attribution → FinBERT news sentiment → LLM risk alerts → professional web
-terminal with grounded chat.
+### UBS Fin AI Bootcamp — CNY/CNH Volatility Intelligence
 
-## Components
+**Decomposing the USD/CNY & USD/CNH implied-volatility surface — beyond ATM, beyond the smile.**
 
-| Piece | Path | Run |
-|---|---|---|
-| Research pipeline | `finai/pipeline/` | `python -m finai.pipeline.run_pipeline` |
-| Output store | `finai/store/*.parquet` | produced by the pipeline |
-| Streamlit research UI | `finai/app/` | `streamlit run finai/app/main.py` |
-| FastAPI backend | `backend/` | `uvicorn backend.main:app --port 8000` |
-| React terminal | `frontend/` | `npm run dev` (port 5173, proxies /api → :8000) |
-| R&D notebooks | `finai/notebooks/` | reference only |
+[![CI](https://github.com/nl2992/UBS_FinAI_BeyondTheSmile/actions/workflows/ci.yml/badge.svg)](https://github.com/nl2992/UBS_FinAI_BeyondTheSmile/actions)
+![Python](https://img.shields.io/badge/python-3.9%2B-blue)
+![React](https://img.shields.io/badge/react-19-61dafb)
+![FastAPI](https://img.shields.io/badge/FastAPI-REST%20%2B%20SSE-009688)
+![Tests](https://img.shields.io/badge/tests-36%20backend%20%2B%2019%20frontend-success)
+
+*Two decades of vol-surface data → leakage-safe factor models → explainable forecasts → an AI research terminal that shows its work.*
+
+</div>
+
+---
+
+## What it does
+
+Ask it a question like:
+
+> **"What drove CNH ATM vol on 2025-12-16?"**
+
+and the terminal streams back a grounded answer — realized RV **0.488** vs HAR-X forecast **0.538**, dominant SHAP driver **prior-week volatility (+1.08)**, with China onshore repo-rate changes and CSI 300 spillovers flagged in the GBM view. Every number is fetched live from the model store via tool calls; **the LLM cannot invent figures**.
+
+Behind that sits a full research stack:
+
+| | |
+|---|---|
+| 🧠 **Factor models** | PCA decomposition of the CNY & CNH vol surfaces (level / skew / curvature / tails), fit strictly in-sample |
+| 📉 **Vol forecasting** | Rolling, no-lookahead **HAR-X**, **GARCH(1,1)**, **MIDAS-GARCH**, and **LightGBM** — benchmarked OOS with QLIKE & correlation vs naive baselines |
+| 🔍 **Explainability** | **SHAP** on every rolling refit window — `TreeExplainer` for the GBM, `LinearExplainer` for HAR-X — per-date driver attribution + monthly stacked view |
+| 📰 **News intelligence** | **FinBERT** sentiment scoring of curated CNY/CNH news, aligned to panel dates |
+| 🚨 **Risk alerts** | LLM-written, UBS-style daily reports — generated *only* from structured model output |
+| 💬 **Grounded chat** | Streaming DeepSeek assistant with tool-calling against the parquet store (SSE, token-by-token) |
+| 📄 **Tear sheets** | One-click branded PDF per factor/model — chart, SHAP drivers, full model table |
+
+## Architecture
+
+```mermaid
+flowchart LR
+    A[("FINAL_Data.csv<br/>5,929 days × 145 cols")] --> B["finai/pipeline<br/>PCA → AR(1) → HAR-X · GBM<br/>SHAP · FinBERT"]
+    B --> C[("finai/store<br/>parquet")]
+    C --> D["backend/<br/>FastAPI · 11 endpoints<br/>REST + SSE chat"]
+    D --> E["frontend/<br/>React · Vite · Tailwind<br/>Terminal · Alerts · Chat"]
+    D -.tool calls.-> F["DeepSeek LLM"]
+    F -.grounded answers.-> D
+    C --> G["finai/app<br/>Streamlit research UI"]
+```
+
+**No look-ahead, anywhere.** IS/OOS split at 2019-12-31: PCA loadings, AR(1) de-meaning, scaling constants, and every rolling model fit use only information available at the time of the forecast.
 
 ## Quick start
 
 ```bash
-# 1. environment (Python 3.9+; venv lives outside the repo for preview compat)
+# 1) environment
+python3 -m venv ~/.venvs/beyond-the-smile
 ~/.venvs/beyond-the-smile/bin/pip install -r requirements.txt
 
-# 2. secrets — never commit .env
-cp .env.example .env   # then fill in DEEPSEEK_API_KEY
+# 2) secrets (never committed)
+cp .env.example .env          # add your DEEPSEEK_API_KEY
 
-# 3. build the store (vol models + SHAP; add news/alerts with no flags)
-~/.venvs/beyond-the-smile/bin/python3 -m finai.pipeline.run_pipeline --skip-sentiment
-
-# 4. backend + frontend (or run them individually — see backend/README.md)
-./scripts/dev.sh            # add --with-streamlit for the research UI too
+# 3) everything, one command
+./scripts/dev.sh              # --with-streamlit for the research UI too
 ```
 
-Open http://localhost:5173.
+→ **http://localhost:5173** — the terminal. **http://localhost:8000/docs** — the API.
 
-## Docker
-
-Run the full stack (FastAPI backend + React frontend) in two containers with a single command.
-
-### Prerequisites
-
-- Docker Desktop (or Docker Engine + Compose v2) installed and running.
-- A DeepSeek API key — only needed for the `/api/chat` and `/api/chat/stream` endpoints; every other endpoint works without it.
-
-### Setup
+### 🐳 Docker
 
 ```bash
-# 1. Create a .env file at the repo root (never commit this file)
 echo "DEEPSEEK_API_KEY=sk-..." > .env
-
-# 2. Build images and start containers
-docker compose up --build
+docker compose up --build     # terminal at http://localhost:8080
 ```
 
-The first build takes a few minutes — it installs Python dependencies and runs the vol-pipeline (HAR-X + GBM + SHAP) to pre-populate `finai/store/` inside the image.
-Subsequent starts are instant (store already baked in).
+The backend image bakes the entire model store at build time — containers start instantly. The nginx layer proxies `/api` with SSE-safe streaming. No keys are ever baked into images.
 
-### Endpoints
+## The terminal
 
-| Service | URL |
+| Page | What you get |
 |---|---|
-| Web terminal | http://localhost:8080 |
-| API (via nginx proxy) | http://localhost:8080/api/health |
-| API (direct, for debugging) | http://localhost:8000/api/health |
-| Interactive API docs | http://localhost:8000/docs |
+| **Overview** | Branded landing — methodology walk-through + live OOS metrics |
+| **Terminal** | Realized vs HAR-X vs GBM vol · OOS model league table · per-date SHAP drivers · monthly attribution stacks · **PDF tear-sheet export** |
+| **Risk Alerts** | FinBERT sentiment strip · generated UBS-style daily reports |
+| **Chat** | Streaming grounded Q&A — watch it consult the data store in real time |
 
-### Stop
+## Engineering
 
-```bash
-docker compose down
+- **55 automated tests** — 36 backend (every endpoint, incl. SSE frames + streaming-generator unit tests) + 19 frontend (SSE chunk-boundary parsing, typed error contract) — all gated in **GitHub Actions CI** on every push, which rebuilds the model store from raw data first.
+- **API contract** — [docs/API_CONTRACT.md](docs/API_CONTRACT.md) is the single source of truth both halves build against.
+- **Reproducible** — pinned CI deps ([requirements-ci.txt](requirements-ci.txt)), containerized runtime, deterministic pipeline (`python -m finai.pipeline.run_pipeline`).
+
+## Repo map
+
+```
+finai/pipeline/   ingestion · PCA factors · vol models · SHAP · sentiment · alerts · CLI
+finai/store/      parquet output store (rebuilt by the pipeline; gitignored)
+finai/app/        Streamlit research UI + shared data access + chat tool layer
+backend/          FastAPI service (REST + SSE chat + PDF tear sheets)
+frontend/         React terminal (Vite · TypeScript · Tailwind · recharts)
+tests/            backend pytest suite
+docs/             API contract
+scripts/dev.sh    one-command dev environment
 ```
 
-## Modeling notes
+## Methodology notes
 
-- In-sample/out-of-sample split at 2019-12-31/2020-01-01; PCA, AR(1) de-meaning,
-  and all rolling model fits use strictly no-lookahead windows.
-- SHAP: `TreeExplainer` on the rolling LightGBM, `LinearExplainer` on the rolling
-  HAR-X OLS — one explainer per refit window, persisted long-format to the store.
-- Chat answers are grounded: the LLM must fetch numbers via tool calls against
-  the parquet store and cannot invent figures.
+- **Surface blocks**: ATM (level, 2 PCs), 25Δ risk-reversal (skew), 25Δ butterfly (curvature), 10Δ RR/BF (tails) — per market, log-diff for ATM, level-diff for wings.
+- **HAR-X**: forecasts log RV(t+1) from daily/weekly/monthly RV terms + ~40 macro exogenous drivers (repo rates, yields, DXY, VIX, equity & FX proxies), refit every 21 days on a 1,260-day window.
+- **SHAP**: one explainer per refit window, so attribution always reflects the coefficients actually used for that forecast — persisted long-format for the API and chat tools.
+- **Grounding discipline**: both the risk-alert generator and the chat assistant operate under "write only from this data" prompts, with the chat additionally forced through typed tool calls.
+
+---
+
+<div align="center">
+<sub>Built for the UBS Fin AI Bootcamp · Author: <a href="https://github.com/nl2992">Nigel Li</a></sub>
+</div>
